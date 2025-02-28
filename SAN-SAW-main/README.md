@@ -34,7 +34,7 @@ If you find it helpful to your research, please cite as follows:
 - Download [**Cityscapes**](https://www.cityscapes-dataset.com/). 
 - Download [**BDDS**](https://doc.bdd100k.com/download.html).
 - Download [**Mapillary**](https://www.mapillary.com/datasets).
-
+[README.md](../HRDA-dg/README.md)
 ## 4. Usage
 You can directly training the network within the following python file by using IDE such as Pycharm.
 ```
@@ -56,6 +56,8 @@ We present the demo on ResNet50. You can change the backbone by converting the f
 ```
 arg_parser.add_argument('--backbone', type=str, default='XXX')  # Network Backbone
 ```
+
+
 
 ## 5. Results
 <p align='center'>
