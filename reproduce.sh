@@ -26,11 +26,11 @@ sh make.sh
 # HRDA-dg
 cd HRDA-dg
 conda create -n hrda python=3.12 -y
-conda activae hrda
+conda activate hrda
 pip install --upgrade pip
 pip install --upgrade setuptools
 pip install --upgrade matplotlib
 pip install -r requirements.txt -f https://download.pytorch.org/whl/torch_stable.html
-pip install mmcv-full  #==1.3.7
+pip install mmcv-full==1.3.7
 
 
