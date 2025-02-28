@@ -2,26 +2,14 @@
 
 
 # HRFormer
-### Example conda environment setup
-conda create --name hgformer python=3.8 -y
-conda activate hgformer
-conda install pytorch==1.9.0 torchvision==0.10.0 cudatoolkit=11.1 -c pytorch -c nvidia
-pip install -U opencv-python
+#  prepare the models pre-trained on ImageNet classificaiton following [tools/README.md](tools/README.md). Finally run:
+#  8 GPUs
+python plain_train_net.py --num-gpus 8 \
+  --config-file configs/cityscapes/hgformer_swin_tiny_bs16_20k.yaml OUTPUT_DIR path_to_output
 
-# under your working directory
-python -m pip install detectron2 -f \
-  https://dl.fbaipublicfiles.com/detectron2/wheels/cu111/torch1.9/index.html
-
-#pip install git+https://github.com/mcordts/cityscapesScripts.git
-
-cd ..
-git clone https://github.com/dingjiansw101/HGFormer.git
-cd HGFormer
-pip install -r requirements.txt
-cd hgformer/modeling/pixel_decoder/ops
-sh make.sh
-
-
+python plain_train_net.py \
+  --config-file configs/cityscapes/hgformer_swin_tiny_bs16_20k.yaml \
+  --num-gpus 1 SOLVER.IMS_PER_BATCH SET_TO_SOME_REASONABLE_VALUE SOLVER.BASE_LR SET_TO_SOME_REASONABLE_VALUE
 
 
 # HRDA-dg

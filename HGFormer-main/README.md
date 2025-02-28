@@ -5,7 +5,7 @@ This is the official code for the [HGFormer](https://openaccess.thecvf.com/conte
 ## Installation
 
 See [installation instructions](INSTALL.md).
-
+[GETTING_STARTED.md](GETTING_STARTED.md)
 ## Getting Started
 
 See [Preparing Datasets for HGFormer](datasets/README.md).
