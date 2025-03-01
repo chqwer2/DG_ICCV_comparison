@@ -118,7 +118,10 @@ class Trainer(DefaultTrainer):
         # Assume these objects must be constructed in this order.
         model = self.build_model(cfg)
         optimizer = self.build_optimizer(cfg, model)
+<<<<<<< Updated upstream
         # data_loader = self.build_train_loader(cfg)
+=======
+>>>>>>> Stashed changes
         from datasets.REFUGE import load_dataset
         data_loader = load_dataset(cfg, "train")  #self.build_train_loader(cfg)
 
@@ -414,6 +417,10 @@ if __name__ == "__main__":
 
     # Add custom arguments
     print("Command Line Args:", args)
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
     os.environ['CUDA_VISIBLE_DEVICES'] = "1"
 
     launch(

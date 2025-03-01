@@ -367,15 +367,21 @@ class SetCriterionSpix(nn.Module):
         src_logits = outputs["pred_logits"].float()
         # import ipdb; ipdb.set_trace()
         idx = self._get_src_permutation_idx(indices)
+        # print("targets['labels']: ", targets[0]["labels"].shape)/
+        # targets['labels']:  torch.Size([1, 512, 512])
+
         target_classes_o = torch.cat([t["labels"][J] for t, (_, J) in zip(targets, indices)])
         target_classes = torch.full(
             src_logits.shape[:2], self.num_classes, dtype=torch.int64, device=src_logits.device
         )
-        target_classes[idx] = target_classes_o
+        target_classes[idx] = target_classes_o.cuda()
+
+
         # import ipdb; ipdb.set_trace()
         # 19 foreground classes, and 1 background class
         # src_logits: [B, num_groups, numclasses+1], target_classes: [B, num_groups] value in [0, 19],
         # self.empty_weight: [19x"1.0" 1x"0.1"]
+
         loss_ce = F.cross_entropy(src_logits.transpose(1, 2), target_classes, self.empty_weight)
         losses = {"loss_ce": loss_ce}
         return losses
@@ -630,7 +636,7 @@ class SetCriterionSpix(nn.Module):
             # import ipdb; ipdb.set_trace()
             pixel_level_logits = outputs["pixel_level_logits"]
             pixel_level_logits = F.interpolate(pixel_level_logits, target_sem_segs.shape[-2:], mode="bilinear", align_corners=False)
-            pixel_cls_loss = F.cross_entropy(pixel_level_logits, target_sem_segs, ignore_index=255)
+            pixel_cls_loss = F.cross_entropy(pixel_level_logits, target_sem_segs.long(), ignore_index=255)
             l_dict = {"pixel_cls_loss": pixel_cls_loss}
             losses.update(l_dict)
 
@@ -641,7 +647,7 @@ class SetCriterionSpix(nn.Module):
                 class_spix_pixel_cls = F.interpolate(class_spix_pixel_cls,
                                                                     target_sem_segs.shape[-2:], mode="bilinear",
                                                                     align_corners=False)
-                spix_pixel_cls_loss = F.cross_entropy(class_spix_pixel_cls, target_sem_segs,
+                spix_pixel_cls_loss = F.cross_entropy(class_spix_pixel_cls, target_sem_segs.long(),
                                                       ignore_index=255)
                 l_dict = {f"spix_pixel_cls_loss_{i}": spix_pixel_cls_loss}
                 losses.update(l_dict)

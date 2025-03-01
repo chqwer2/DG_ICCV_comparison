@@ -219,6 +219,49 @@ class GroupFormer(nn.Module):
     def device(self):
         return self.pixel_mean.device
 
+    def generate_instance_masks(self, sem_seg, num_classes):
+        """
+        Convert semantic segmentation maps into instance segmentation masks.
+        Uses connected component analysis to separate objects of the same class.
+
+        sem_seg: Tensor [B, H, W] - Class labels for each pixel
+        num_classes: Number of classes in segmentation
+        """
+        import cv2
+        import numpy as np
+
+        sem_seg = sem_seg.squeeze(1)
+        B, H, W = sem_seg.shape
+        gt_instances = []
+
+        for b in range(B):  # Iterate over batch
+            instance_masks = []
+            class_labels = []
+            sem_seg_np = sem_seg[b].cpu().numpy()  # Convert to NumPy for OpenCV
+
+            for class_id in range(num_classes):
+                # Create binary mask for the current class
+                binary_mask = (sem_seg_np == class_id).astype(np.uint8)
+
+                # Apply connected component analysis
+                num_labels, labels = cv2.connectedComponents(binary_mask)
+
+                for i in range(1, num_labels):  # Ignore background (label 0)
+                    instance_mask = (labels == i).astype(np.uint8)
+                    instance_masks.append(torch.tensor(instance_mask, dtype=torch.uint8))
+                    class_labels.append(class_id)
+
+            instances = Instances((H, W))
+            if instance_masks:
+                instance_masks = torch.stack(instance_masks, dim=0)  # Shape: [N, H, W]
+                bit_masks = instance_masks  # BitMasks
+                instances.gt_masks = bit_masks
+                instances.gt_classes = torch.tensor(class_labels, dtype=torch.int64)
+
+            gt_instances.append(instances)
+
+        return gt_instances
+
     def forward(self, batched_inputs):
         """
         Args:
@@ -264,18 +307,19 @@ class GroupFormer(nn.Module):
             features = self.backbone(images.tensor)
             outputs = self.sem_seg_head(features)
             # mask classification target
-            if "instances" in batched_inputs:
+            if True: #"instances" in batched_inputs[0]:
                 # "height": 1024, "width": 2048 (original shape)
                 # "image".shape: [3, 512, 1024] (resized shape)
                 # "sem_seg".shape: [512, 1024] (same as resized shape)
-
                 # gt_instances = [x["instances"].to(self.device) for x in batched_inputs]
-                # gt_sem_segs = batched_inputs['label'].to(self.device)    #[x["sem_seg"].to(self.device) for x in batched_inputs]
-                # targets = self.prepare_targets(gt_instances, gt_sem_segs, images)
+                gt_sem_segs = batched_inputs['label'].to(self.device)  #[x["sem_seg"].to(self.device) for x in batched_inputs]
 
-                targets = batched_inputs['label'].to(self.device)
+                gt_instances = self.generate_instance_masks(gt_sem_segs, 3)
+
+                targets = self.prepare_targets(gt_instances, gt_sem_segs, images)
             else:
-                targets = batched_inputs['label'].to(self.device)  #None
+                targets = None
+
             # bipartite matching-based loss
             # outputs['pred_masks'].shape: [2, 64, 64, 128]
             # target[0]['masks'].shape [9, 512, 1024]
@@ -392,7 +436,7 @@ class GroupFormer(nn.Module):
         for i in range(len(gt_instances)):
             # pad gt
             instance = gt_instances[i]
-            sem_seg = gt_sem_segs[i]
+            sem_seg = gt_sem_segs[i][0]
             image = images.tensor[i]
 
             gt_masks = instance.gt_masks

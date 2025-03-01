@@ -7,7 +7,7 @@ import torch
 import torch.nn.functional as F
 from scipy.optimize import linear_sum_assignment
 from torch import nn
-from torch.cuda.amp import autocast
+from torch.amp import autocast
 
 from detectron2.projects.point_rend.point_features import point_sample
 
@@ -109,7 +109,7 @@ class HungarianMatcher(nn.Module):
             # Compute the classification cost. Contrary to the loss, we don't use the NLL,
             # but approximate it in 1 - proba[target class].
             # The 1 is a constant that doesn't change the matching, it can be ommitted.
-            cost_class = -out_prob[:, tgt_ids]
+            cost_class = -out_prob[:, tgt_ids.long()]
 
             out_mask = outputs["pred_masks"][b]  # [num_queries, H_pred, W_pred]
             # gt masks are already padded when preparing target
@@ -133,7 +133,7 @@ class HungarianMatcher(nn.Module):
                 align_corners=False,
             ).squeeze(1)
 
-            with autocast(enabled=False):
+            with autocast(enabled=False, device_type="cuda"):
                 out_mask = out_mask.float()
                 tgt_mask = tgt_mask.float()
                 # Compute the focal loss between masks
@@ -156,7 +156,19 @@ class HungarianMatcher(nn.Module):
             if torch.any(torch.isinf(cost_dice)):
                 print('$$$$$$$$$$$$$$$$$$%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%: 6')
 
-            # Final cost matrix
+
+            # print("cost_mask: ", cost_mask.shape, self.cost_mask)
+            # print("cost_class: ", cost_class.shape, self.cost_class)
+            # print("cost_dice: ", cost_dice.shape, self.cost_dice)
+
+            # cost_mask:  torch.Size([32, 1]) 5.0
+            # cost_class:  torch.Size([32, 1, 512, 512]) 2.0
+            # cost_dice:  torch.Size([32, 1]) 5.0
+
+            # TODO
+            # cost_class = cost_class.mean(dim=(2, 3), keepdim=True)  # Shape: [32, 1, 1, 1]
+
+            # Final cost matrixf
             C = (
                 self.cost_mask * cost_mask
                 + self.cost_class * cost_class

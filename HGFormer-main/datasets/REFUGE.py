@@ -48,17 +48,17 @@ def load_dataset(args, split="train"):
 
     if split == "train":
         trainset = CacheDataset(data=data, transform=get_transforms(train=True))
-        loader = DataLoader(trainset, batch_size=16,
-                            num_workers=8, pin_memory=True, shuffle=True)
+        loader = DataLoader(trainset, batch_size=8,
+                            num_workers=4, pin_memory=True, shuffle=True)
 
 
     elif split == "val":
         valset = Dataset(data=data, transform=get_transforms(train=False))
-        loader = DataLoader(valset, batch_size=1, num_workers=8, pin_memory=True, shuffle=False)
+        loader = DataLoader(valset, batch_size=1, num_workers=4, pin_memory=True, shuffle=False)
 
     elif split == "test":
         testset = Dataset(data=data, transform=get_transforms(train=False))
-        loader = DataLoader(testset, batch_size=1, num_workers=8, pin_memory=True, shuffle=False)
+        loader = DataLoader(testset, batch_size=1, num_workers=4, pin_memory=True, shuffle=False)
 
     return loader
 
