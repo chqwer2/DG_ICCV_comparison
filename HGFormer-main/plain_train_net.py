@@ -409,7 +409,14 @@ def main(args):
 
 if __name__ == "__main__":
     args = default_argument_parser().parse_args()
+
+    # Add custom arguments
+    args.add_argument("--batch_size", type=int, default=16, help="batch size")
+    args.add_argument("--data_loader_workers", type=int, default=4, help="number of workers")
+
     print("Command Line Args:", args)
+
+
     launch(
         main,
         args.num_gpus,
