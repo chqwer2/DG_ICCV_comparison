@@ -8,9 +8,14 @@
 #  --config-file configs/cityscapes/hgformer_swin_tiny_bs16_20k.yaml OUTPUT_DIR path_to_output
 cd HGFormer-main/
 conda activate hg
+
+wget https://github.com/SwinTransformer/storage/releases/download/v1.0.0/swin_tiny_patch4_window7_224.pth
+python tools/convert-pretrained-swin-model-to-d2.py swin_tiny_patch4_window7_224.pth swin_tiny_patch4_window7_224.pkl
+
+
 python plain_train_net.py \
   --config-file configs/cityscapes/hgformer_swin_tiny_bs16_20k.yaml \
-  --num-gpus 1  --batch_size 16 --output_dir ./output
+  --num-gpus 1   #  --batch_size 16 --output_dir ./output
 
 
   #SOLVER.IMS_PER_BATCH SET_TO_SOME_REASONABLE_VALUE SOLVER.BASE_LR SET_TO_SOME_REASONABLE_VALUE
@@ -55,12 +60,6 @@ cd DG_ICCV_comparison/
 cd SAN-SAW-main
 mamba activate hrda
 python  tools/train.py    # 640×640 resolution
-
-
-
-
-
-pip install tensorboardX   kmeans1d  imageio
 
 
 

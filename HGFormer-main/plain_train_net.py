@@ -118,7 +118,9 @@ class Trainer(DefaultTrainer):
         # Assume these objects must be constructed in this order.
         model = self.build_model(cfg)
         optimizer = self.build_optimizer(cfg, model)
-        data_loader = self.build_train_loader(cfg)
+        # data_loader = self.build_train_loader(cfg)
+        from datasets.REFUGE import load_dataset
+        data_loader = load_dataset(cfg, "train")  #self.build_train_loader(cfg)
 
         model = create_ddp_model(model, broadcast_buffers=False, find_unused_parameters=True)
         self._trainer = (AMPTrainer if cfg.SOLVER.AMP.ENABLED else SimpleTrainer)(
@@ -409,9 +411,10 @@ def main(args):
 
 if __name__ == "__main__":
     args = default_argument_parser().parse_args()
+
     # Add custom arguments
     print("Command Line Args:", args)
-
+    os.environ['CUDA_VISIBLE_DEVICES'] = "1"
 
     launch(
         main,
