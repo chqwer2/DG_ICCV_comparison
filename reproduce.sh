@@ -1,3 +1,10 @@
+# Download Dataset
+
+
+https://www.kaggle.com/datasets/arnavjain1/glaucoma-datasets
+
+/bask/projects/j/jiaoj-rep-learn/Hao/datasets
+
 
 
 # HRFormer
@@ -69,5 +76,6 @@ pip install --upgrade matplotlib
 mamba install -c nvidia cuda-toolkit -y
 
 mamba install pytorch torchvision cudatoolkit torchaudio pytorch-cuda  -c pytorch -c nvidia  -y
+pip install tensorboardX   kmeans1d  imageio
 
 

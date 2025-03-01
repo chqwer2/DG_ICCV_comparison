@@ -6,6 +6,7 @@ import glob
 
 # Define paths
 refuge_root = "/home/cbtil3/Downloads/REFUGE"
+refuge_root = "/bask/projects/j/jiaoj-rep-learn/Hao/datasets/REFUGE"
 refuge_crop_size = (512, 512)
 
 
