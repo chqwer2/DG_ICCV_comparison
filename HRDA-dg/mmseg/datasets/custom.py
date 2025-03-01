@@ -78,37 +78,46 @@ class CustomDataset(Dataset):
 
     def __init__(self,
                  pipeline,
-                 img_dir,
+                 img_dir=None,
                  img_suffix='.jpg',
                  ann_dir=None,
                  seg_map_suffix='.png',
                  split=None,
                  data_root=None,
+                 mode=None,
                  test_mode=False,
                  ignore_index=255,
                  reduce_zero_label=False,
                  classes=None,
                  palette=None):
+
         self.pipeline = Compose(pipeline)
         self.img_dir = img_dir
         self.img_suffix = img_suffix
         self.ann_dir = ann_dir
         self.seg_map_suffix = seg_map_suffix
         self.split = split
-        self.data_root = data_root
+        self.data_root = "/home/cbtil3/Downloads/REFUGE"   #TODO  data_root
         self.test_mode = test_mode
         self.ignore_index = ignore_index
         self.reduce_zero_label = reduce_zero_label
         self.label_map = None
+
+        self.size = (512, 512)
+
         self.CLASSES, self.PALETTE = self.get_classes_and_palette(
             classes, palette)
+
+        # self.img_dir = "Images"
+        # self.ann_dir = "Masks"
+        self.mode=mode
 
         # join paths if data_root is specified
         if self.data_root is not None:
             if not osp.isabs(self.img_dir):
-                self.img_dir = osp.join(self.data_root, self.img_dir)
+                self.img_dir = osp.join(self.data_root, self.mode, self.img_dir)
             if not (self.ann_dir is None or osp.isabs(self.ann_dir)):
-                self.ann_dir = osp.join(self.data_root, self.ann_dir)
+                self.ann_dir = osp.join(self.data_root, self.mode, self.ann_dir)
             if not (self.split is None or osp.isabs(self.split)):
                 self.split = osp.join(self.data_root, self.split)
 
@@ -155,6 +164,8 @@ class CustomDataset(Dataset):
                     seg_map = img.replace(img_suffix, seg_map_suffix)
                     img_info['ann'] = dict(seg_map=seg_map)
                 img_infos.append(img_info)
+
+        print(f"Loaded {len(img_infos)} images from {img_dir}")
 
         print_log(
             f'Loaded {len(img_infos)} images from {img_dir}',

@@ -22,6 +22,7 @@ from utils.train_helper import get_model
 from datasets.cityscapes_Dataset import City_Dataset, City_DataLoader, inv_preprocess, decode_labels
 from datasets.gta5_Dataset import GTA5_DataLoader, GTA5_xuanran_DataLoader, Mix_DataLoader
 from datasets.synthia_Dataset import SYNTHIA_DataLoader
+from datasets.REFUGE import load_dataset
 
 datasets_path = {
     'cityscapes': {'data_root_path': '../../DATASETS/datasets_original/Cityscapes', 'list_path': '../datasets/city_list',
@@ -132,7 +133,14 @@ class Trainer():
 
         # self.model.to(self.device)
         self.model = self.model.cuda()
-        self.model = torch.nn.DataParallel(self.model, device_ids=device_ids)
+        print(torch.cuda.is_available())
+        print(torch.cuda.device_count())
+        print(torch.cuda.current_device())
+        # print(torch.cuda.get_device_name(0))  # Chec/k if device 0 is valid
+
+        self.model = self.model.cuda(device_ids[0])
+
+        # self.model = torch.nn.DataParallel(self.model).cuda()
 
         # if torch.cuda.is_available():
         #     if len(device_ids) > 1:
@@ -158,17 +166,27 @@ class Trainer():
         if self.args.dataset == "cityscapes":
             self.dataloader = City_DataLoader(self.args)
         elif self.args.dataset == "gta5":
-            self.dataloader = GTA5_DataLoader(self.args)
+            self.dataloader = load_dataset(args, "train")
+            # self.dataloader = GTA5_DataLoader(self.args)  # Using this
         else:
             self.dataloader = SYNTHIA_DataLoader(self.args)
         if self.args.val_dataset == "cityscapes":
-            self.test_dataloader = City_DataLoader(self.args)
+            self.test_dataloader = load_dataset(args, "val") #City_DataLoader(self.args)  # TODO
         else:
             self.test_dataloader = SYNTHIA_DataLoader(self.args)
-        self.dataloader.num_iterations = min(self.dataloader.num_iterations, ITER_MAX)
-        print(self.args.iter_max, self.dataloader.num_iterations)
-        self.epoch_num = ceil(self.args.iter_max / self.dataloader.num_iterations) if self.args.iter_stop is None else \
-            ceil(self.args.iter_stop / self.dataloader.num_iterations)
+        # self.num_iterations = min(self.num_iterations, ITER_MAX)
+        # print(self.args.iter_max, self.num_iterations)
+
+        num_samples = len(self.dataloader.dataset)  # Total samples
+        batch_size = self.dataloader.batch_size  # Batch size
+        num_iterations = (num_samples + batch_size - 1) // batch_size
+
+        valid_iterations = (len(self.test_dataloader.dataset) + self.test_dataloader.batch_size - 1) // self.test_dataloader.batch_size
+        self.valid_iterations = valid_iterations
+
+        self.num_iterations = num_iterations
+        self.epoch_num = ceil(self.args.iter_max / num_iterations) if self.args.iter_stop is None else \
+            ceil(self.args.iter_stop / num_iterations)
 
     def main(self):
         # display args details
@@ -179,7 +197,7 @@ class Trainer():
         # choose cuda
         if self.cuda:
             current_device = torch.cuda.current_device()
-            self.logger.info("This model will run on {}".format(torch.cuda.get_device_name(current_device)))
+            self.logger.info("This model will run on {}".format(current_device))
         else:
             self.logger.info("This model will run on CPU")
 
@@ -215,7 +233,7 @@ class Trainer():
             #
             self.current_MIoU = MIoU
             is_best = MIoU > self.best_MIou
-            torch.save(self.model.module.state_dict(),
+            torch.save(self.model.state_dict(),
                        os.path.join(args.checkpoint_dir, '{}.pt'.format(epoch)))
 
 
@@ -225,7 +243,7 @@ class Trainer():
                 self.best_iter = self.current_iter
                 self.logger.info("=>saving a new best checkpoint...")
                 self.save_checkpoint(self.train_id + 'best.pth')
-                torch.save(self.model.module.state_dict(),
+                torch.save(self.model.state_dict(),
                            os.path.join(args.checkpoint_dir, 'best.pt'))
             else:
                 self.logger.info("=> The MIoU of val does't improve.")
@@ -257,15 +275,15 @@ class Trainer():
         return ones
 
     def train_one_epoch(self,pixel_num):
-        tqdm_epoch = tqdm(self.dataloader.data_loader,
-                          total=self.dataloader.num_iterations,
+        tqdm_epoch = tqdm(self.dataloader,
+                          total=self.num_iterations,
                           desc="Train Epoch-{}-total-{}".format(self.current_epoch + 1, self.epoch_num),file=sys.stdout)
         self.logger.info("Training one epoch...")
         self.Eval.reset()
 
         train_loss = []
         loss_seg_value_2 = 0
-        iter_num = self.dataloader.num_iterations
+        iter_num = self.num_iterations
 
         if self.args.freeze_bn:
             self.model.eval()
@@ -276,7 +294,17 @@ class Trainer():
 
         batch_idx = 0
 
-        for x, y, _ in tqdm_epoch:
+        for data in tqdm_epoch:
+
+            # print("data = ", data)
+            x = data['image']
+            y = data['label']
+
+            # print("x, y = ", x.size(), y.size(), x.min(), x.max(), y.min(), y.max())
+            # x, y =  torch.Size([2, 3, 512, 512]) torch.Size([2, 1, 512, 512]) metatensor(0.) metatensor(1.) metatensor(0.) metatensor(0.)
+
+
+
             self.poly_lr_scheduler(
                 optimizer=self.optimizer,
                 init_lr=self.args.lr,
@@ -294,7 +322,9 @@ class Trainer():
             if len(device_ids) > 1:
                 self.writer.add_scalar('learning_rate', self.optimizer.module.param_groups[0]["lr"], self.current_iter)
             else:
-                self.writer.add_scalar('learning_rate', self.optimizer.param_groups[0]["lr"], self.current_iter)
+                self.writer.add_scalar('learning_rate',
+                                       self.optimizer.param_groups[0]["lr"],
+                                       self.current_iter)
 
             if self.cuda:
                 x, y = x.to(self.device), y.to(device=self.device, dtype=torch.long)
@@ -353,22 +383,22 @@ class Trainer():
                 mask = torch.unsqueeze(gt_one_hot[:, i, :, :], 1)
                 mask = F.interpolate(mask, size=mid_lay2_ori.size()[2:],mode='nearest')
                 out = mid_lay2_ori * mask
-                out = self.model.module.SAN_stage_2.IN(out)
+                out = self.model.SAN_stage_2.IN(out)
                 # out = nn.InstanceNorm2d(512, affine=True)(out)
                 outs_lay2.append(out)
             mid_lay2_label = sum(outs_lay2)
-            mid_lay2_label = self.model.module.SAN_stage_2.relu(mid_lay2_label)
+            mid_lay2_label = self.model.SAN_stage_2.relu(mid_lay2_label)
 
             outs_lay1 = []
             for i in args.selected_classes:
                 mask = torch.unsqueeze(gt_one_hot[:, i, :, :], 1)
                 mask = F.interpolate(mask, size=mid_lay1_ori.size()[2:], mode='nearest')
                 out = mid_lay1_ori * mask
-                out = self.model.module.SAN_stage_1.IN(out)
+                out = self.model.SAN_stage_1.IN(out)
                 # out = nn.InstanceNorm2d(512, affine=True)(out)
                 outs_lay1.append(out)
             mid_lay1_label = sum(outs_lay1)
-            mid_lay1_label = self.model.module.SAN_stage_1.relu(mid_lay1_label)
+            mid_lay1_label = self.model.SAN_stage_1.relu(mid_lay1_label)
 
 
             # loss
@@ -436,7 +466,7 @@ class Trainer():
             argpred = np.argmax(pred, axis=1)
             self.Eval.add_batch(label, argpred)
 
-            if batch_idx == self.dataloader.num_iterations:
+            if batch_idx == self.num_iterations:
                 break
 
         #######
@@ -455,9 +485,11 @@ class Trainer():
         labels_colors = decode_labels(label, self.args.show_num_images)
         preds_colors = decode_labels(argpred, self.args.show_num_images)
         for index, (img, lab, color_pred) in enumerate(zip(images_inv, labels_colors, preds_colors)):
-            self.writer.add_image('train/' + str(index) + '/Images', img, self.current_epoch)
+
+
+            self.writer.add_image('train/' + str(index) + '/Images', img.as_tensor(), self.current_epoch)
             self.writer.add_image('train/' + str(index) + '/Labels', lab, self.current_epoch)
-            self.writer.add_image('train/' + str(index) + '/preds', color_pred, self.current_epoch)
+            self.writer.add_image('train/' + str(index) + '/preds',  color_pred, self.current_epoch)
 
         if self.args.class_16:
             PA = self.Eval.Pixel_Accuracy()
@@ -485,14 +517,18 @@ class Trainer():
         self.logger.info('\nvalidating one epoch...')
         self.Eval.reset()
         with torch.no_grad():
-            tqdm_batch = tqdm(self.test_dataloader.val_loader, total=self.test_dataloader.valid_iterations,
+            tqdm_batch = tqdm(self.test_dataloader, total=self.valid_iterations,
                               desc="Val Epoch-{}-".format(self.current_epoch + 1),file=sys.stdout)
             if mode == 'val':
                 self.model.eval()
 
             i = 0
 
-            for x, y, id in tqdm_batch:
+            for data in tqdm_batch:
+
+                x = data['image']
+                y = data['label']
+
                 if self.cuda:
                     x, y = x.to(self.device), y.to(device=self.device, dtype=torch.long)
 
@@ -517,7 +553,7 @@ class Trainer():
             labels_colors = decode_labels(label, self.args.show_num_images)
             preds_colors = decode_labels(argpred, self.args.show_num_images)
             for index, (img, lab, color_pred) in enumerate(zip(images_inv, labels_colors, preds_colors)):
-                self.writer.add_image(str(index) + '/Images', img, self.current_epoch)
+                self.writer.add_image(str(index) + '/Images', img.as_tensor(), self.current_epoch)
                 self.writer.add_image(str(index) + '/Labels', lab, self.current_epoch)
                 self.writer.add_image(str(index) + '/preds', color_pred, self.current_epoch)
 
@@ -574,11 +610,15 @@ class Trainer():
         self.logger.info('\nvalidating source domain...')
         self.Eval.reset()
         with torch.no_grad():
-            tqdm_batch = tqdm(self.source_val_dataloader, total=self.dataloader.valid_iterations,
+            tqdm_batch = tqdm(self.source_val_dataloader, total=self.valid_iterations,
                               desc="Source Val Epoch-{}-".format(self.current_epoch + 1))
             self.model.eval()
             i = 0
-            for x, y, id in tqdm_batch:
+            for data in tqdm_batch:
+
+                x = data['image']
+                y = data['label']
+
                 # y.to(torch.long)
                 if self.cuda:
                     x, y = x.to(self.device), y.to(device=self.device, dtype=torch.long)
@@ -600,7 +640,7 @@ class Trainer():
                 self.Eval.add_batch(label, argpred)
 
                 i += 1
-                if i == self.dataloader.valid_iterations:
+                if i == self.valid_iterations:
                     break
 
             # show val result on tensorboard
@@ -700,7 +740,7 @@ class Trainer():
             if 'state_dict' in checkpoint:
                 self.model.load_state_dict(checkpoint['state_dict'])
             else:
-                self.model.module.load_state_dict(checkpoint)
+                self.model.load_state_dict(checkpoint)
             self.logger.info("Checkpoint loaded successfully from " + filename)
         except OSError as e:
             self.logger.info("No checkpoint exists from '{}'. Skipping...".format(self.args.checkpoint_dir))

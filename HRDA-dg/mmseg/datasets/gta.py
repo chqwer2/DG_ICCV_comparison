@@ -11,15 +11,36 @@ from .custom import CustomDataset
 
 @DATASETS.register_module()
 class GTADataset(CustomDataset):
-    CLASSES = CityscapesDataset.CLASSES
-    PALETTE = CityscapesDataset.PALETTE
+    # Define classes and palette based on REFUGE dataset
+    CLASSES = ('background', 'optic_disc', 'optic_cup')  # Example classes
+    PALETTE = [(0, 0, 0), (255, 0, 0), (0, 255, 0)]  # Corresponding colors
 
     def __init__(self, **kwargs):
-        assert kwargs.get('split') in [None, 'train']
-        if 'split' in kwargs:
-            kwargs.pop('split')
+        assert kwargs.get('split') in [None, 'train', 'val', 'test']  # Adjusted for REFUGE splits
         super(GTADataset, self).__init__(
-            img_suffix='.png',
-            seg_map_suffix='_labelTrainIds.png',
+            img_suffix='.jpg',  # REFUGE images might be '.jpg'
+            seg_map_suffix='.png',  # Adjust based on REFUGE mask format
             split=None,
             **kwargs)
+
+
+#
+# @DATASETS.register_module()
+# class GTADataset(CustomDataset):
+#     # CLASSES = CityscapesDataset.CLASSES
+#     # PALETTE = CityscapesDataset.PALETTE
+#
+#     CLASSES = ('background', 'optic_disc', 'optic_cup')  # Example classes
+#     PALETTE = [(0, 0, 0), (255, 0, 0), (0, 255, 0)]  # Corresponding colors
+#
+#     def __init__(self, **kwargs):
+#         assert kwargs.get('split') in [None, 'train']
+#         if 'split' in kwargs:
+#             kwargs.pop('split')
+#
+#         super(GTADataset, self).__init__(
+#             img_suffix='.png',
+#             seg_map_suffix='_labelTrainIds.png',
+#             split=None,
+#             **kwargs)
+

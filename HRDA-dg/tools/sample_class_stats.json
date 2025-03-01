@@ -1,0 +1,13 @@
+{
+    "total_pixels": 1746777600,
+    "class_pixel_counts": {
+        "background": 1717159458,
+        "optic_disc": 21799713,
+        "optic_cup": 7818429
+    },
+    "class_percentages": {
+        "background": 98.30441253654729,
+        "optic_disc": 1.247995909725428,
+        "optic_cup": 0.44759155372727477
+    }
+}

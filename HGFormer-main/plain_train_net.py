@@ -354,7 +354,7 @@ def setup(args):
     add_deeplab_config(cfg)
     add_maskformer2_config(cfg)
     cfg.merge_from_file(args.config_file)
-    cfg.merge_from_list(args.opts)
+    cfg.merge_from_list(args.opts)        # TODO
     cfg.freeze()
     default_setup(cfg, args)
     # Setup logger for "mask_former" module

@@ -128,7 +128,7 @@ class UDADataset(object):
     def get_rare_class_source_sample(self):
         c = np.random.choice(self.rcs_classes, p=self.rcs_classprob)
         f1 = np.random.choice(self.samples_with_class[c])
-        i1 = self.file_to_idx[f1]
+        i1 = int(f1.split(".")[0][1:])  #self.file_to_idx[f1]
         s1 = self.source[i1]
         if self.rcs_min_crop_ratio > 0:
             for j in range(10):

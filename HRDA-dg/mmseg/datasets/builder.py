@@ -63,10 +63,14 @@ def _concat_dataset(cfg, default_args=None):
     return ConcatDataset(datasets)
 
 
-def build_dataset(cfg, default_args=None):
+
+def build_dataset(cfg, default_args=None, mode="test"):
     """Build datasets."""
+    # print("cfg = ", cfg.keys())
+    print("input mode=", mode)
+
     from .dataset_wrappers import ConcatDataset, RepeatDataset
-    from mmseg.datasets import UDADataset, DGDataset
+    from mmseg.datasets import UDADataset, DGDataset, GTADataset
     if cfg['type'] == 'UDADataset':
         dataset = UDADataset(
             source=build_dataset(cfg['source'], default_args),
@@ -82,9 +86,15 @@ def build_dataset(cfg, default_args=None):
             build_dataset(cfg['dataset'], default_args), cfg['times'])
     elif isinstance(cfg.get('img_dir'), (list, tuple)) or isinstance(
             cfg.get('split', None), (list, tuple)):
+
         dataset = _concat_dataset(cfg, default_args)
     else:
-        dataset = build_from_cfg(cfg, DATASETS, default_args)
+        # This is the normal branch
+        dataset = GTADataset(pipeline=cfg['pipeline'],
+                   img_dir="Images", ann_dir="Masks",
+                             # split=mode,
+                   mode=mode)
+
 
     return dataset
 

@@ -22,6 +22,7 @@ class GTA5_Dataset(City_Dataset):
                  base_size=769,
                  crop_size=769,
                  training=True):
+
         self.xuanran = args.xuanran_path
         self.args = args
         self.data_path=data_root_path
@@ -82,6 +83,8 @@ class GTA5_Dataset(City_Dataset):
             image, gt_image = self._val_sync_transform(image, gt_image)
 
         return image, gt_image, item
+
+
 
 class GTA5_DataLoader():
     def __init__(self, args, training=True):

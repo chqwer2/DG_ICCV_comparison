@@ -148,11 +148,16 @@ def main(args):
 
     logger.info(model)
 
-    datasets = [build_dataset(cfg.data.train)]
+    # from tool.REFUGE import get_transforms, load_dataset
+
+    # build the dataloader
+    datasets = [build_dataset(cfg.data.train, mode="train")]
     if len(cfg.workflow) == 2:
         val_dataset = copy.deepcopy(cfg.data.val)
         val_dataset.pipeline = cfg.data.train.pipeline
-        datasets.append(build_dataset(val_dataset))
+        datasets.append(build_dataset(val_dataset, mode="val"))
+
+
     if cfg.checkpoint_config is not None:
         # save mmseg version, config file content and class names in
         # checkpoints as meta data
@@ -161,6 +166,10 @@ def main(args):
             config=cfg.pretty_text,
             CLASSES=datasets[0].CLASSES,
             PALETTE=datasets[0].PALETTE)
+
+    print("datasets =", len(datasets[0]))
+
+
     # add an attribute for visualization convenience
     model.CLASSES = datasets[0].CLASSES
     # passing checkpoint meta for saving best checkpoint
