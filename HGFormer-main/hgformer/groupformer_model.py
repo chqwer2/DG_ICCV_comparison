@@ -245,7 +245,7 @@ class GroupFormer(nn.Module):
                     segments_info (list[dict]): Describe each segment in `panoptic_seg`.
                         Each dict contains keys "id", "category_id", "isthing".
         """
-        images = [x["image"].to(self.device) for x in batched_inputs]
+        images = batched_inputs['image'].to(self.device)  #[x["image"].to(self.device) for x in batched_inputs]
         # import ipdb; ipdb.set_trace()
 
         if not self.dynamic_mean_std:
@@ -264,15 +264,18 @@ class GroupFormer(nn.Module):
             features = self.backbone(images.tensor)
             outputs = self.sem_seg_head(features)
             # mask classification target
-            if "instances" in batched_inputs[0]:
+            if "instances" in batched_inputs:
                 # "height": 1024, "width": 2048 (original shape)
                 # "image".shape: [3, 512, 1024] (resized shape)
                 # "sem_seg".shape: [512, 1024] (same as resized shape)
-                gt_instances = [x["instances"].to(self.device) for x in batched_inputs]
-                gt_sem_segs = [x["sem_seg"].to(self.device) for x in batched_inputs]
-                targets = self.prepare_targets(gt_instances, gt_sem_segs, images)
+
+                # gt_instances = [x["instances"].to(self.device) for x in batched_inputs]
+                # gt_sem_segs = batched_inputs['label'].to(self.device)    #[x["sem_seg"].to(self.device) for x in batched_inputs]
+                # targets = self.prepare_targets(gt_instances, gt_sem_segs, images)
+
+                targets = batched_inputs['label'].to(self.device)
             else:
-                targets = None
+                targets = batched_inputs['label'].to(self.device)  #None
             # bipartite matching-based loss
             # outputs['pred_masks'].shape: [2, 64, 64, 128]
             # target[0]['masks'].shape [9, 512, 1024]
