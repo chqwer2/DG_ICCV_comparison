@@ -299,6 +299,9 @@ def setup(args):
     cfg.merge_from_list(args.opts)
     cfg.freeze()
     default_setup(cfg, args)
+
+    cfg.OUTPUT_DIR = "./output"
+
     # Setup logger for "mask_former" module
     setup_logger(output=cfg.OUTPUT_DIR, distributed_rank=comm.get_rank(), name="mask2former")
     return cfg
@@ -326,8 +329,17 @@ def main(args):
 
 
 if __name__ == "__main__":
-    args = default_argument_parser().parse_args()
+    args = default_argument_parser()
+
+    # Add custom arguments
+    args.add_argument("--batch_size", type=int, default=16, help="batch size")
+    args.add_argument("--data_loader_workers", type=int, default=4, help="number of workers")
+
     print("Command Line Args:", args)
+
+    args = args.parse_args()
+
+
     launch(
         main,
         args.num_gpus,

@@ -7,10 +7,13 @@
 #python plain_train_net.py --num-gpus 8 \
 #  --config-file configs/cityscapes/hgformer_swin_tiny_bs16_20k.yaml OUTPUT_DIR path_to_output
 cd HGFormer-main/
-conda activate hgformer
+conda activate hg
 python plain_train_net.py \
   --config-file configs/cityscapes/hgformer_swin_tiny_bs16_20k.yaml \
-  --num-gpus 1 SOLVER.IMS_PER_BATCH SET_TO_SOME_REASONABLE_VALUE SOLVER.BASE_LR SET_TO_SOME_REASONABLE_VALUE
+  --num-gpus 1  --batch_size 16 --output_dir ./output
+
+
+  #SOLVER.IMS_PER_BATCH SET_TO_SOME_REASONABLE_VALUE SOLVER.BASE_LR SET_TO_SOME_REASONABLE_VALUE
 
 
 # HRDA-dg
