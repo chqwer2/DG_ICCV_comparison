@@ -749,7 +749,7 @@ class Trainer():
     def load_checkpoint(self, filename):
         try:
             self.logger.info("Loading checkpoint '{}'".format(filename))
-            checkpoint = torch.load(filename)
+            checkpoint = torch.load(filename, map_location="cpu")
 
             if 'state_dict' in checkpoint:
                 self.model.load_state_dict(checkpoint['state_dict'])
