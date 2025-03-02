@@ -221,9 +221,9 @@ class Trainer():
     def train(self):
 
 
-        if self.validate_only:
+        if self.args.validate_only:
             # load
-            pth_file = args.pth
+            pth_file = self.args.pth
             self.load_checkpoint(pth_file)
 
             self.validate()  # check image summary
