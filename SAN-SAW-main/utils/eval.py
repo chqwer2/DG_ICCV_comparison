@@ -18,7 +18,7 @@ class Eval():
         self.ignore_index = None
         self.synthia = True if num_class == 16 else False
 
-    def Dice_Coefficient(self, out_16_13=False):
+    def Dice(self, out_16_13=False):
         Dice = 2 * np.diag(self.confusion_matrix) / (
                 np.sum(self.confusion_matrix, axis=1) + np.sum(self.confusion_matrix, axis=0))
 
