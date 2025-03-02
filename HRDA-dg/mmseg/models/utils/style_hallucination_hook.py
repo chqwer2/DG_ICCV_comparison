@@ -27,8 +27,14 @@ class StyleHallucinationHook(EvalHook):
         runner.model.eval()
         prog_bar = mmcv.ProgressBar(len(self.dataloader))
         style_list = []
+        runner.model.to(torch.device("cuda" if torch.cuda.is_available() else "cpu"))
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        # inputs = inputs
         with torch.no_grad():
             for i, data_batch in enumerate(self.dataloader):
+
+                # data_batch = data_batch.to(device)
+
                 style_feats = runner.model(
                     **data_batch, return_loss=False, return_style=True)
                 img_mean = style_feats.mean(dim=[2, 3])  # B,C

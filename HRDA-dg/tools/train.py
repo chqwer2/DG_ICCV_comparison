@@ -127,6 +127,7 @@ def main(args):
     meta['env_info'] = env_info
 
     # log some basic info
+    print("--------distributed =", distributed)
     logger.info(f'Distributed training: {distributed}')
     logger.info(f'Config:\n{cfg.pretty_text}')
 
@@ -161,6 +162,7 @@ def main(args):
     if cfg.checkpoint_config is not None:
         # save mmseg version, config file content and class names in
         # checkpoints as meta data
+
         cfg.checkpoint_config.meta = dict(
             mmseg_version=f'{__version__}+{get_git_hash()[:7]}',
             config=cfg.pretty_text,
@@ -178,7 +180,7 @@ def main(args):
         model,
         datasets,
         cfg,
-        distributed=distributed,
+        # distributed=distributed,
         validate=(not args.no_validate),
         timestamp=timestamp,
         meta=meta)
