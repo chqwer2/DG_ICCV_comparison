@@ -24,7 +24,7 @@ class Eval():
 
         # Avoid division by zero
         dice = np.where(fp_fn == 0, 0, 2 * tp / fp_fn)
-
+        dice = np.nanmean(dice[:self.ignore_index])
         return dice
 
     def Pixel_Accuracy(self):
