@@ -10,7 +10,7 @@ See [installation instructions](INSTALL.md).
 
 See [Preparing Datasets for HGFormer](datasets/README.md).
 
-See [Getting Started with HGFormer](GETTING_STARTED.md).
+See [Getting Started wi[README.md](../SAN-SAW-main/README.md)th HGFormer](GETTING_STARTED.md).
 
 ## Pre-trained Models and Baselines
 

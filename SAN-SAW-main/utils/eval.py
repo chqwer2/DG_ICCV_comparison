@@ -18,6 +18,14 @@ class Eval():
         self.ignore_index = None
         self.synthia = True if num_class == 16 else False
 
+    def Dice(self):
+        tp = np.diag(self.confusion_matrix)  # True Positives
+        fp_fn = np.sum(self.confusion_matrix, axis=1) + np.sum(self.confusion_matrix, axis=0)  # Sum of row and column
+
+        # Avoid division by zero
+        dice = np.where(fp_fn == 0, 0, 2 * tp / fp_fn)
+
+        return dice
 
     def Pixel_Accuracy(self):
         if np.sum(self.confusion_matrix) == 0:

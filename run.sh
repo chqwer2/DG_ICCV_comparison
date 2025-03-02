@@ -59,8 +59,9 @@ mkdir -p /home/cbtil3/hao/repo/DG_ICCV_comparison/SAN-SAW-main/log/gta5_pretrain
 cd DG_ICCV_comparison/
 cd SAN-SAW-main
 mamba activate hrda
-python  tools/train.py    # 640×640 resolution
+python  tools/train.py  # Test:  --validate_only   --pth    log/gta5_pretrain_2/718.pt
 
+#Epoch: PA1:0.996, MPA1:0.921, MIoU1:0.813, FWIoU1:0.993, PC:0.866
 
 
 

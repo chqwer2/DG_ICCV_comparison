@@ -219,17 +219,27 @@ class Trainer():
         self.writer.close()
 
     def train(self):
-        # self.validate() # check image summary
+
+
+        if self.validate_only:
+            # load
+            pth_file = args.pth
+            self.load_checkpoint(pth_file)
+
+            self.validate()  # check image summary
+            return
+
         pixel_num = []
         for epoch in range(self.current_epoch, self.epoch_num):
 
             self.train_one_epoch(pixel_num = pixel_num)
             # validate
-            PA, MPA, MIoU, FWIoU = self.validate()
+            PA, MPA, MIoU, FWIoU, Dice = self.validate()
             self.writer.add_scalar('PA', PA, self.current_epoch)
             self.writer.add_scalar('MPA', MPA, self.current_epoch)
             self.writer.add_scalar('MIoU', MIoU, self.current_epoch)
             self.writer.add_scalar('FWIoU', FWIoU, self.current_epoch)
+            self.writer.add_scalar('Dice', Dice, self.current_epoch)
             #
             self.current_MIoU = MIoU
             is_best = MIoU > self.best_MIou
@@ -523,9 +533,7 @@ class Trainer():
                 self.model.eval()
 
             i = 0
-
             for data in tqdm_batch:
-
                 x = data['image']
                 y = data['label']
 
@@ -564,16 +572,20 @@ class Trainer():
                     MIoU_16, MIoU_13 = Eval.Mean_Intersection_over_Union()
                     FWIoU_16, FWIoU_13 = Eval.Frequency_Weighted_Intersection_over_Union()
                     PC_16, PC_13 = Eval.Mean_Precision()
+                    Dice = Eval.Dice()
+
                     print("########## Eval{} ############".format(name))
 
                     self.logger.info(
-                        '\nEpoch:{:.3f}, {} PA:{:.3f}, MPA_16:{:.3f}, MIoU_16:{:.3f}, FWIoU_16:{:.3f}, PC_16:{:.3f}'.format(
+                        '\nEpoch:{:.3f}, {} PA:{:.3f}, MPA_16:{:.3f}, MIoU_16:{:.3f}, FWIoU_16:{:.3f}, PC_16:{:.3f}, Dice:{:.3f}'.format(
                             self.current_epoch, name, PA, MPA_16,
-                            MIoU_16, FWIoU_16, PC_16))
+                            MIoU_16, FWIoU_16, PC_16, Dice))
+
                     self.logger.info(
                         '\nEpoch:{:.3f}, {} PA:{:.3f}, MPA_13:{:.3f}, MIoU_13:{:.3f}, FWIoU_13:{:.3f}, PC_13:{:.3f}'.format(
                             self.current_epoch, name, PA, MPA_13,
                             MIoU_13, FWIoU_13, PC_13))
+
                     self.writer.add_scalar('PA' + name, PA, self.current_epoch)
                     self.writer.add_scalar('MPA_16' + name, MPA_16, self.current_epoch)
                     self.writer.add_scalar('MIoU_16' + name, MIoU_16, self.current_epoch)
@@ -589,22 +601,24 @@ class Trainer():
                     MIoU = Eval.Mean_Intersection_over_Union()
                     FWIoU = Eval.Frequency_Weighted_Intersection_over_Union()
                     PC = Eval.Mean_Precision()
+                    Dice = Eval.Dice()
                     print("########## Eval{} ############".format(name))
 
                     self.logger.info(
-                        '\nEpoch:{:.3f}, {} PA1:{:.3f}, MPA1:{:.3f}, MIoU1:{:.3f}, FWIoU1:{:.3f}, PC:{:.3f}'.format(
+                        '\nEpoch:{:.3f}, {} PA1:{:.3f}, MPA1:{:.3f}, MIoU1:{:.3f}, FWIoU1:{:.3f}, PC:{:.3f}, Dice:{:.3f}'.format(
                             self.current_epoch, name, PA, MPA,
-                            MIoU, FWIoU, PC))
+                            MIoU, FWIoU, PC, Dice))
+
                     self.writer.add_scalar('PA' + name, PA, self.current_epoch)
                     self.writer.add_scalar('MPA' + name, MPA, self.current_epoch)
                     self.writer.add_scalar('MIoU' + name, MIoU, self.current_epoch)
                     self.writer.add_scalar('FWIoU' + name, FWIoU, self.current_epoch)
-                    return PA, MPA, MIoU, FWIoU
+                    return PA, MPA, MIoU, FWIoU, Dice
 
-            PA, MPA, MIoU, FWIoU = val_info(self.Eval, "")
+            PA, MPA, MIoU, FWIoU, Dice = val_info(self.Eval, "")
             tqdm_batch.close()
 
-        return PA, MPA, MIoU, FWIoU
+        return PA, MPA, MIoU, FWIoU, Dice
 
     def validate_source(self):
         self.logger.info('\nvalidating source domain...')
@@ -864,6 +878,11 @@ def add_train_args(arg_parser):
                             help='output model middle feature')
     arg_parser.add_argument('--lambda_seg', type=float, default=0.1,
                             help="lambda_seg of middle output")
+
+    arg_parser.add_argument('--validate_only', action='store_true',
+                            help='validate only')
+    arg_parser.add_argument('--pth', default=None, type=str,
+                            help='pth file path')
     return arg_parser
 
 
