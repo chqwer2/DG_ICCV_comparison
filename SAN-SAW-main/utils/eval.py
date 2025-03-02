@@ -18,14 +18,22 @@ class Eval():
         self.ignore_index = None
         self.synthia = True if num_class == 16 else False
 
-    def Dice(self):
-        tp = np.diag(self.confusion_matrix)  # True Positives
-        fp_fn = np.sum(self.confusion_matrix, axis=1) + np.sum(self.confusion_matrix, axis=0)  # Sum of row and column
+    def Dice_Coefficient(self, out_16_13=False):
+        Dice = 2 * np.diag(self.confusion_matrix) / (
+                np.sum(self.confusion_matrix, axis=1) + np.sum(self.confusion_matrix, axis=0))
 
-        # Avoid division by zero
-        dice = np.where(fp_fn == 0, 0, 2 * tp / fp_fn)
-        dice = np.nanmean(dice[:self.ignore_index])
-        return dice
+        if self.synthia:
+            Dice_16 = np.nanmean(Dice[:self.ignore_index])
+            Dice_13 = np.nanmean(Dice[synthia_set_16_to_13])
+            return Dice_16, Dice_13
+
+        if out_16_13:
+            Dice_16 = np.nanmean(Dice[synthia_set_16])
+            Dice_13 = np.nanmean(Dice[synthia_set_13])
+            return Dice_16, Dice_13
+
+        Dice = np.nanmean(Dice[:self.ignore_index])
+        return Dice
 
     def Pixel_Accuracy(self):
         if np.sum(self.confusion_matrix) == 0:
