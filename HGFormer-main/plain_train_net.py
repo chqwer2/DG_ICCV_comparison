@@ -413,9 +413,10 @@ def main(args):
                 writer.writerow(results)
         return res
 
+
     from pprint import pprint
     pprint(cfg)
-    
+
     trainer = Trainer(cfg)
     trainer.resume_or_load(resume=args.resume)
     return trainer.train()
@@ -424,9 +425,13 @@ def main(args):
 if __name__ == "__main__":
     args = default_argument_parser().parse_args()
 
+    args.TEST.EVAL_PERIOD = 10  # DEBUG
+
     # Add custom arguments
     from pprint import pprint
     pprint(args)
+
+
 
     os.environ['CUDA_VISIBLE_DEVICES'] = "1"
 
