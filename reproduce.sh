@@ -40,6 +40,7 @@ pip install torch==2.4.0+cu124 torchvision==0.19.0+cu124 torchaudio==2.4.0+cu124
 #pip install git+https://github.com/mcordts/cityscapesScripts.git
 
 mamba install -c nvidia cuda-toolkit  -y
+pip install cityscapesScripts
 
 
 
