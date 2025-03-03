@@ -88,7 +88,7 @@ if __name__ == '__main__':
         # Generate Configs
         for i, cfg in enumerate(cfgs):
 
-            cfg['evaluation']['interval'] = 100
+
 
 
             if args.debug:
@@ -118,6 +118,10 @@ if __name__ == '__main__':
 
     if args.machine == 'local':
         for i, cfg in enumerate(cfgs):
+
+            print("DEBUG MODE")
+            cfg['evaluation']['interval'] = 100   # TODO debug
+
             if args.startup_test and cfg['seed'] != 0:
                 continue
             print('Run job {}'.format(cfg['name']))
