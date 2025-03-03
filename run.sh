@@ -22,8 +22,10 @@ python demo/inference.py --config-file configs/cityscapes/hgformer_swin_tiny_bs1
 --input datasets/acdc/rgb_anon/all/test --output path_to_output \
 --opts MODEL.WEIGHTS path_to_checkpoint
 
+
 python plain_train_net.py --num-gpus 8 --config-file configs/cityscapes/hgformer_swin_tiny_bs16_20k.yaml \
 --eval-only MODEL.WEIGHTS path_to_checkpoint OUTPUT_DIR path_to_output
+
 
 
 

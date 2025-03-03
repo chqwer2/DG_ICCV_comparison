@@ -87,6 +87,10 @@ if __name__ == '__main__':
         cfgs = generate_experiment_cfgs(args.exp)
         # Generate Configs
         for i, cfg in enumerate(cfgs):
+
+            cfg['evaluation']['interval'] = 100
+
+
             if args.debug:
                 cfg.setdefault('log_config', {})['interval'] = 10
                 cfg['evaluation'] = dict(interval=200, metric='mIoU')

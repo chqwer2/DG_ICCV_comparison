@@ -146,7 +146,7 @@ class Trainer(DefaultTrainer):
     def build_test_loader(self, cfg, name):
 
         from datasets.REFUGE import load_dataset
-        return load_dataset(cfg, "test")   # TODO
+        return load_dataset(cfg, "val")   # TODO
 
 
     @classmethod
