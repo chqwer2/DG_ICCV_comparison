@@ -413,6 +413,9 @@ def main(args):
                 writer.writerow(results)
         return res
 
+    from pprint import pprint
+    pprint(cfg)
+    
     trainer = Trainer(cfg)
     trainer.resume_or_load(resume=args.resume)
     return trainer.train()
@@ -422,7 +425,8 @@ if __name__ == "__main__":
     args = default_argument_parser().parse_args()
 
     # Add custom arguments
-    print("Command Line Args:", args)
+    from pprint import pprint
+    pprint(args)
 
     os.environ['CUDA_VISIBLE_DEVICES'] = "1"
 

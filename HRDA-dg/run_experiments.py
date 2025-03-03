@@ -119,8 +119,8 @@ if __name__ == '__main__':
     if args.machine == 'local':
         for i, cfg in enumerate(cfgs):
 
-            print("DEBUG MODE")
-            cfg['evaluation']['interval'] = 10   # TODO debug
+            # print("DEBUG MODE")
+            # cfg['evaluation']['interval'] = 10   # TODO debug
 
             if args.startup_test and cfg['seed'] != 0:
                 continue
