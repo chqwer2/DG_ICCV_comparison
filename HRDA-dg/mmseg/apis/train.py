@@ -107,8 +107,8 @@ def train_segmentor(model,
 
     # interval'
     cfg.checkpoint_config['interval'] = 2000
-    
-    print("--------cfg.checkpoint_config =", cfg.checkpoint_config)
+
+    # print("--------cfg.checkpoint_config =", cfg.checkpoint_config)
 
     # register hooks
     runner.register_training_hooks(cfg.lr_config, cfg.optimizer_config,
