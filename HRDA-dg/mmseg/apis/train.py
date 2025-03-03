@@ -104,6 +104,10 @@ def train_segmentor(model,
             logger=logger,
             meta=meta))
 
+
+    # interval'
+    cfg.checkpoint_config['interval'] = 2000
+    
     print("--------cfg.checkpoint_config =", cfg.checkpoint_config)
 
     # register hooks
