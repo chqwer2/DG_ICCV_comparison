@@ -120,7 +120,7 @@ if __name__ == '__main__':
         for i, cfg in enumerate(cfgs):
 
             print("DEBUG MODE")
-            cfg['evaluation']['interval'] = 100   # TODO debug
+            cfg['evaluation']['interval'] = 10   # TODO debug
 
             if args.startup_test and cfg['seed'] != 0:
                 continue
