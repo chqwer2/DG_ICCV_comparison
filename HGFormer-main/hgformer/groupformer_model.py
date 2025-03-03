@@ -398,10 +398,12 @@ class GroupFormer(nn.Module):
             # mask_cls_results: [1, 100, 20], mask_pred_results: [1, 100, 1024, 1824]
             # height: 1080, width: 1920, image_size: [1024, 1820]
             for mask_cls_result, mask_pred_result, input_per_image, image_size in zip(
-                mask_cls_results, mask_pred_results, batched_inputs, images.image_sizes
+                mask_cls_results, mask_pred_results, images, images.image_sizes
             ):
-                height = input_per_image.get("height", image_size[0])
-                width = input_per_image.get("width", image_size[1])
+                height = input_per_image.shape[-2]
+                width = input_per_image.shape[-1]
+                # height = input_per_image.get("height", image_size[0])
+                # width = input_per_image.get("width", image_size[1])
                 processed_results.append({})
 
                 # self.sem_seg_postprocess_before_inference: False
