@@ -354,8 +354,9 @@ class GroupFormer(nn.Module):
                                                    mode="bilinear",
                                                    align_corners=False,)
                 processed_results_pixel = []
+
                 for pixel_level_logit, input_per_image, image_size in zip(
-                        pixel_level_logits, batched_inputs, images.image_sizes):
+                        pixel_level_logits, images, images.image_sizes):
                     height = input_per_image.get("height", image_size[0])
                     width = input_per_image.get("width", image_size[1])
                     processed_results_pixel.append({})
@@ -375,7 +376,7 @@ class GroupFormer(nn.Module):
                                                    align_corners=False, )
                         tmp_processed_results = []
                         for seg_logit, input_per_image, image_size in zip(
-                                seg_logits, batched_inputs, images.image_sizes):
+                                seg_logits, images, images.image_sizes):
                             height = input_per_image.get("height", image_size[0])
                             width = input_per_image.get("width", image_size[1])
                             tmp_processed_results.append({})
