@@ -15,6 +15,7 @@ def get_transforms(train=True):
         LoadImaged(keys=["image", "label"]),
         EnsureChannelFirstd(keys=["image", "label"]),
         Resized(keys=["image", "label"], spatial_size=refuge_crop_size),
+        # mode: SequenceStr = InterpolateMode.AREA,
         # ResizeWithPadOrCropd(keys=["image", "label"], spatial_size=refuge_crop_size),
         ScaleIntensityd(keys=["image"]),
     ]

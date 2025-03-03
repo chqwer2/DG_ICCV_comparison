@@ -411,6 +411,7 @@ def main(args):
 
                 writer.writerow(outputnames)
                 writer.writerow(results)
+
         return res
 
 

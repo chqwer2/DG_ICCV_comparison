@@ -180,12 +180,9 @@ if __name__ == "__main__":
         # use PIL, to be consistent with evaluation
         img = read_image(path, format="BGR")
         msk = plt.imread(mask_path) * 255
-        # print("unique:", np.unique(msk), img.shape)
 
         img = cv2.resize(img, (512, 512))
         msk = cv2.resize(msk, (512, 512), interpolation=cv2.INTER_NEAREST)
-
-        # img shape: (1, 512, 512, 3) (1, 512, 512)
 
         start_time = time.time()
         # predictions, visualized_output = demo.run_on_image(img)

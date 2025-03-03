@@ -29,13 +29,18 @@ python plain_train_net.py --num-gpus 8 --config-file configs/cityscapes/hgformer
 # Test
 conda activate hg
 
-checkpoint=./output/model_0004999.pth
+checkpoint=./output/model_0019999.pth
 path_to_output=./output
 
 python demo/inference.py --config-file configs/cityscapes/hgformer_swin_tiny_bs16_20k.yaml \
 --input datasets/acdc/rgb_anon/all/test --output $path_to_output \
 --opts MODEL.WEIGHTS $checkpoint
 
+
+HRFormer
+# mIoU | mDice |
+#+-------+-------+
+# 88.43 | 93.96 |
 
 
 # ---------------------------------- HRDA-dg ----------------------------------
@@ -73,6 +78,7 @@ CHECKPOINT_FILE="${TEST_ROOT}/iter_18000.pth"
 python -m tools.test ${CONFIG_FILE} ${CHECKPOINT_FILE} \
         --eval mIoU mDice --show-dir ${SHOW_DIR} --opacity 1
 
+# hrda
 # aAcc   |  mIoU |  mAcc | mDice |
 #+-------+-------+-------+-------+
 #| 99.76 | 87.68 | 93.59 | 93.22 |
@@ -97,7 +103,9 @@ mamba activate hrda
 python  tools/train.py  # Test:  --validate_only   --pth    log/gta5_pretrain_2/718.pt
 # Test
 python  tools/train.py  --validate_only   --pth    log/gta5_pretrain_2/718.pt
-#Val Epoch:0.000, MIoU1:0.809, FWIoU1:0.992, PC:0.858, Dice:0.888
+# SAN-SAW
+# Val Epoch:0.000, MIoU1:0.809, Dice:0.888
+
 
 
 
