@@ -44,7 +44,7 @@ def load_dataset(args, split="train"):
     data = [{"image": img, "label": mask} for img, mask in zip(img_files, mask_files)]
 
 
-    data = data[:10]
+    # data = data[:10]
 
     if split == "train":
         trainset = CacheDataset(data=data, transform=get_transforms(train=True))
