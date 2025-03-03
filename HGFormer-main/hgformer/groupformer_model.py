@@ -357,8 +357,10 @@ class GroupFormer(nn.Module):
 
                 for pixel_level_logit, input_per_image, image_size in zip(
                         pixel_level_logits, images, images.image_sizes):
+
                     height = input_per_image.get("height", image_size[0])
                     width = input_per_image.get("width", image_size[1])
+
                     processed_results_pixel.append({})
                     # import ipdb; ipdb.set_trace()
                     sem_seg = pixel_level_logit.softmax(0)

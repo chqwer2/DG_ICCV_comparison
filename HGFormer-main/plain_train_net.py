@@ -414,8 +414,8 @@ def main(args):
         return res
 
 
-    from pprint import pprint
-    pprint("cfg=", cfg)
+    # from pprint import pprint
+    # pprint("cfg=", cfg)
 
     trainer = Trainer(cfg)
     trainer.resume_or_load(resume=args.resume)
@@ -425,11 +425,11 @@ def main(args):
 if __name__ == "__main__":
     args = default_argument_parser().parse_args()
 
-    args.TEST.EVAL_PERIOD = 10  # DEBUG
+    # args.TEST.EVAL_PERIOD = 10  # DEBUG
 
     # Add custom arguments
-    from pprint import pprint
-    pprint("args=", args)
+    # from pprint import pprint
+    # pprint("args=", args)
 
 
 
