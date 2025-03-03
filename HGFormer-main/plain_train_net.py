@@ -143,7 +143,7 @@ class Trainer(DefaultTrainer):
         self.register_hooks(self.build_hooks())
 
 
-    def build_test_loader(self, cfg, name):
+    def build_test_loader(self, cfg, name=None):
 
         from datasets.REFUGE import load_dataset
         return load_dataset(cfg, "val")   # TODO
@@ -415,7 +415,7 @@ def main(args):
 
 
     from pprint import pprint
-    pprint(cfg)
+    pprint("cfg=", cfg)
 
     trainer = Trainer(cfg)
     trainer.resume_or_load(resume=args.resume)
@@ -429,7 +429,7 @@ if __name__ == "__main__":
 
     # Add custom arguments
     from pprint import pprint
-    pprint(args)
+    pprint("args=", args)
 
 
 
