@@ -7,6 +7,10 @@ import os
 
 # fmt: off
 import sys
+from idlelib import filelist
+
+# from Past_to_Future.our.control.ldm.models.diffusion.dpm_solver.dpm_solver import expand_dims
+
 sys.path.insert(1, os.path.join(sys.path[0], '..'))
 # fmt: on
 
@@ -108,6 +112,42 @@ def test_opencv_video_format(codec, file_ext):
         return False
 
 
+import numpy as np
+
+
+def compute_overall_iou_dice(gt, pred, ignore_class = 0):
+    """
+    Compute overall IoU and Dice score for the entire image, ignoring the background class.
+
+    Parameters:
+        gt (ndarray): Ground truth mask of shape (H, W)
+        pred (ndarray): Predicted mask of shape (H, W)
+        ignore_class (int): Class ID to ignore (default: 0 for background)
+
+    Returns:
+        tuple: (Overall IoU, Overall Dice)
+    """
+    # Create a mask to ignore background pixels
+    fg_mask = gt != ignore_class  # True for foreground pixels
+
+    # Apply the mask to filter out background pixels
+    gt = gt[fg_mask]
+    pred = pred[fg_mask]
+
+    # Compute True Positives (TP), False Positives (FP), False Negatives (FN)
+    tp = np.sum(gt == pred)  # Correctly classified pixels
+    fp = np.sum(gt != pred)  # Incorrectly classified pixels
+    fn = fp  # Every misclassification is both FP and FN
+
+    # Compute overall IoU
+    overall_iou = tp / (tp + fp + fn) if (tp + fp + fn) > 0 else 0
+
+    # Compute overall Dice coefficient
+    overall_dice = (2 * tp) / (2 * tp + fp + fn) if (2 * tp + fp + fn) > 0 else 0
+
+    return overall_iou, overall_dice
+
+
 if __name__ == "__main__":
     mp.set_start_method("spawn", force=True)
     args = get_parser().parse_args()
@@ -120,10 +160,33 @@ if __name__ == "__main__":
     demo = VisualizationDemo(cfg)
 
     # import ipdb; ipdb.set_trace()
-    filelist = GetFileFromThisRootDir(args.input[0])
-    for path in tqdm.tqdm(filelist, disable=not args.output):
+    # filelist = GetFileFromThisRootDir(args.input[0])
+    refuge_root = "/home/cbtil3/Downloads/REFUGE"
+    split="val"
+    img_dir  = os.path.join(refuge_root, f"{split}/Images")
+    mask_dir = os.path.join(refuge_root, f"{split}/Masks")
+
+    img_files  = sorted(glob.glob(os.path.join(img_dir, "*.jpg")))
+    mask_files = sorted(glob.glob(os.path.join(mask_dir, "*.png")))
+
+    filelist = img_files
+    num_classes = 3
+
+    all_iou = []
+    all_dice = []
+
+    import matplotlib.pyplot as plt
+    for (path, mask_path) in tqdm.tqdm(zip(filelist, mask_files), disable=not args.output):
         # use PIL, to be consistent with evaluation
         img = read_image(path, format="BGR")
+        msk = plt.imread(mask_path) * 255
+        # print("unique:", np.unique(msk), img.shape)
+
+        img = cv2.resize(img, (512, 512))
+        msk = cv2.resize(msk, (512, 512), interpolation=cv2.INTER_NEAREST)
+
+        # img shape: (1, 512, 512, 3) (1, 512, 512)
+
         start_time = time.time()
         # predictions, visualized_output = demo.run_on_image(img)
         predictions = demo.predictor(img)
@@ -145,4 +208,23 @@ if __name__ == "__main__":
         output_path = os.path.join(args.output, basename)
 
         outimg = predictions['sem_seg'].detach().cpu().numpy().argmax(0).astype(np.uint8)
+        outimg = cv2.resize(outimg, (512, 512), interpolation=cv2.INTER_NEAREST)
+
+
+         # = calculate_iou(msk, outimg)
+        iou, dice = compute_overall_iou_dice(msk, outimg)
+        all_iou.append(iou)
+        all_dice.append(dice)
+
+        print("outimg shape:", outimg.shape, np.unique(outimg), iou, dice)
+        # outimg shape: (1024, 1024)
+        outimg = outimg*125
+        outimg = cv2.cvtColor(outimg, cv2.COLOR_GRAY2BGR)
+
+        # Calculate IoU and Dice
+        print("output path=", output_path)
         cv2.imwrite(output_path, outimg)
+
+print("IoU:", np.mean(all_iou, axis=0))
+print("Dice:", np.mean(all_dice, axis=0))
+

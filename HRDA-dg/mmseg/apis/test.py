@@ -70,6 +70,7 @@ def single_gpu_test(model,
             img_tensor = data['img'][0]
             img_metas = data['img_metas'][0].data[0]
             imgs = tensor2imgs(img_tensor, **img_metas[0]['img_norm_cfg'])
+
             assert len(imgs) == len(img_metas)
 
             for img, img_meta in zip(imgs, img_metas):
@@ -111,6 +112,7 @@ def single_gpu_test(model,
         batch_size = len(result)
         for _ in range(batch_size):
             prog_bar.update()
+
     return results
 
 

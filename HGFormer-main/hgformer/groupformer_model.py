@@ -288,7 +288,11 @@ class GroupFormer(nn.Module):
                     segments_info (list[dict]): Describe each segment in `panoptic_seg`.
                         Each dict contains keys "id", "category_id", "isthing".
         """
-        images = batched_inputs['image'].to(self.device)  #[x["image"].to(self.device) for x in batched_inputs]
+        if isinstance(batched_inputs, dict):
+            images = batched_inputs['image'].to(self.device)  #
+        else:
+            images = [x["image"].to(self.device) for x in batched_inputs]
+
         # import ipdb; ipdb.set_trace()
 
         if not self.dynamic_mean_std:

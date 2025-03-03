@@ -88,9 +88,6 @@ if __name__ == '__main__':
         # Generate Configs
         for i, cfg in enumerate(cfgs):
 
-
-
-
             if args.debug:
                 cfg.setdefault('log_config', {})['interval'] = 10
                 cfg['evaluation'] = dict(interval=200, metric='mIoU')

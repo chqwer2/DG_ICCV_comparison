@@ -26,10 +26,16 @@ python demo/inference.py --config-file configs/cityscapes/hgformer_swin_tiny_bs1
 python plain_train_net.py --num-gpus 8 --config-file configs/cityscapes/hgformer_swin_tiny_bs16_20k.yaml \
 --eval-only MODEL.WEIGHTS path_to_checkpoint OUTPUT_DIR path_to_output
 
+# Test
+conda activate hg
 
+checkpoint=./output/model_0004999.pth
+path_to_output=./output
 
+python demo/inference.py --config-file configs/cityscapes/hgformer_swin_tiny_bs16_20k.yaml \
+--input datasets/acdc/rgb_anon/all/test --output $path_to_output \
+--opts MODEL.WEIGHTS $checkpoint
 
- ./output/model_0004999.pth
 
 
 # ---------------------------------- HRDA-dg ----------------------------------
@@ -54,6 +60,27 @@ python run_experiments.py --exp 50
 23100 epoch
 
 
+#TEST_ROOT=$1
+#CONFIG_FILE="${TEST_ROOT}/*${TEST_ROOT: -1}.json"
+
+mamba activate hrda
+TEST_ROOT=work_dirs/local-exp50/250303_1416_gtaCAug2cs_dgdacs_fdthings_srconly_rcs001_shade_shb_daformer_sepaspp_mitb5_poly10warm_s0_f2b81
+CONFIG_FILE=${TEST_ROOT}/250303_1416_gtaCAug2cs_dgdacs_fdthings_srconly_rcs001_shade_shb_daformer_sepaspp_mitb5_poly10warm_s0_f2b81.json
+SHOW_DIR="$./preds"
+CHECKPOINT_FILE="${TEST_ROOT}/iter_18000.pth"
+
+
+python -m tools.test ${CONFIG_FILE} ${CHECKPOINT_FILE} \
+        --eval mIoU mDice --show-dir ${SHOW_DIR} --opacity 1
+
+# aAcc   |  mIoU |  mAcc | mDice |
+#+-------+-------+-------+-------+
+#| 99.76 | 87.68 | 93.59 | 93.22 |
+
+
+
+
+
 # --------------------------- SAN-SAW ---------------------------
 ### Step 1
 wget http://vllab.ucmerced.edu/ytsai/CVPR18/DeepLab_resnet_pretrained_init-f81d91e8.pth
@@ -70,18 +97,7 @@ mamba activate hrda
 python  tools/train.py  # Test:  --validate_only   --pth    log/gta5_pretrain_2/718.pt
 # Test
 python  tools/train.py  --validate_only   --pth    log/gta5_pretrain_2/718.pt
-#Val Epoch:0.000,  PA1:0.996, MPA1:0.924, MIoU1:0.809, FWIoU1:0.992, PC:0.858, Dice:0.888
-
-
-
-TEST_ROOT=$1
-CONFIG_FILE="${TEST_ROOT}/*${TEST_ROOT: -1}.json"
-CHECKPOINT_FILE="${TEST_ROOT}/latest.pth"
-SHOW_DIR="${TEST_ROOT}/preds"
-echo 'Config File:' $CONFIG_FILE
-echo 'Checkpoint File:' $CHECKPOINT_FILE
-echo 'Predictions Output Directory:' $SHOW_DIR
-python -m tools.test ${CONFIG_FILE} ${CHECKPOINT_FILE} --eval mIoU --show-dir ${SHOW_DIR} --opacity 1
+#Val Epoch:0.000, MIoU1:0.809, FWIoU1:0.992, PC:0.858, Dice:0.888
 
 
 

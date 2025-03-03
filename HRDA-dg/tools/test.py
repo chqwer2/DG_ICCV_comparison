@@ -154,6 +154,7 @@ def main():
             0.5, 0.75, 1.0, 1.25, 1.5, 1.75
         ]
         cfg.data.test.pipeline[1].flip = True
+
     cfg.model.pretrained = None
     cfg.data.test.test_mode = True
     if args.inference_mode == 'same':
@@ -190,6 +191,7 @@ def main():
         for k in cfg.data.test:
             if isinstance(cfg.data.test[k], str):
                 cfg.data.test[k] = cfg.data.test[k].replace('val', 'train')
+
     if args.test_set:
         eval_set = 'test'
         for k in cfg.data.test:
@@ -206,7 +208,7 @@ def main():
     # build the dataloader
     # TODO: support multiple images per gpu (only minor changes are needed)
     if args.dataset == 'Config':
-        dataset = build_dataset(cfg.data.test)
+        dataset = build_dataset(cfg.data.test, mode="val")
     elif args.dataset == 'Cityscapes':
         pipeline = deepcopy(cfg.data.test.pipeline)
         dataset = build_dataset(
@@ -236,12 +238,18 @@ def main():
                 pipeline=pipeline))
     else:
         raise NotImplementedError(args.dataset)
+
+    dataset = build_dataset(cfg.data.test, mode="val")       # TODO
     data_loader = build_dataloader(
         dataset,
         samples_per_gpu=1,
         workers_per_gpu=cfg.data.workers_per_gpu,
         dist=distributed,
         shuffle=False)
+
+    # from REFUGE import load_dataset
+    # data_loader = load_dataset(args, split="val")
+
 
     # build the model and load checkpoint
     cfg.model.train_cfg = None
