@@ -104,6 +104,8 @@ def train_segmentor(model,
             logger=logger,
             meta=meta))
 
+    print("--------cfg.checkpoint_config =", cfg.checkpoint_config)
+
     # register hooks
     runner.register_training_hooks(cfg.lr_config, cfg.optimizer_config,
                                    cfg.checkpoint_config, cfg.log_config,
