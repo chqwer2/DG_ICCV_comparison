@@ -358,8 +358,11 @@ class GroupFormer(nn.Module):
                 for pixel_level_logit, input_per_image, image_size in zip(
                         pixel_level_logits, images, images.image_sizes):
 
-                    height = input_per_image.get("height", image_size[0])
-                    width = input_per_image.get("width", image_size[1])
+                    height = input_per_image.shape[-2]
+                    width = input_per_image.shape[-1]
+
+                    # height = input_per_image.get("height", image_size[0])
+                    # width = input_per_image.get("width", image_size[1])
 
                     processed_results_pixel.append({})
                     # import ipdb; ipdb.set_trace()
@@ -379,8 +382,10 @@ class GroupFormer(nn.Module):
                         tmp_processed_results = []
                         for seg_logit, input_per_image, image_size in zip(
                                 seg_logits, images, images.image_sizes):
-                            height = input_per_image.get("height", image_size[0])
-                            width = input_per_image.get("width", image_size[1])
+                            height = input_per_image.shape[-2]
+                            width = input_per_image.shape[-1]
+                            # height = input_per_image.get("height", image_size[0])
+                            # width = input_per_image.get("width", image_size[1])
                             tmp_processed_results.append({})
                             sem_seg = seg_logit.softmax(0)
                             sem_seg = retry_if_cuda_oom(sem_seg_postprocess)(sem_seg, image_size, height, width)
