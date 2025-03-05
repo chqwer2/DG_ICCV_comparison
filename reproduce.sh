@@ -1,13 +1,10 @@
 # Download Dataset
-
-
 https://www.kaggle.com/datasets/arnavjain1/glaucoma-datasets
-
 /bask/projects/j/jiaoj-rep-learn/Hao/datasets
 
 
 
-# HRFormer
+# ------------- HRFormer-----------
 ### Example mamba environment setup
 mamba create --name hg python=3.12  -y
 mamba activate hg
@@ -43,13 +40,12 @@ mamba install -c nvidia cuda-toolkit  -y
 pip install cityscapesScripts
 
 
-
-#  ---------------------------------------------
-
 cd HGFormer-main
 pip install -r requirements.txt
 cd hgformer/modeling/pixel_decoder/ops
 sh make.sh
+
+
 
 
 # --------------------------------------------------

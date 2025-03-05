@@ -12,19 +12,10 @@ conda activate hg
 wget https://github.com/SwinTransformer/storage/releases/download/v1.0.0/swin_tiny_patch4_window7_224.pth
 python tools/convert-pretrained-swin-model-to-d2.py swin_tiny_patch4_window7_224.pth swin_tiny_patch4_window7_224.pkl
 
-
+# Train
 python plain_train_net.py \
   --config-file configs/cityscapes/hgformer_swin_tiny_bs16_20k.yaml \
   --num-gpus 1   #  --batch_size 16 --output_dir ./output
-
-# Test
-python demo/inference.py --config-file configs/cityscapes/hgformer_swin_tiny_bs16_20k.yaml \
---input datasets/acdc/rgb_anon/all/test --output path_to_output \
---opts MODEL.WEIGHTS path_to_checkpoint
-
-
-python plain_train_net.py --num-gpus 8 --config-file configs/cityscapes/hgformer_swin_tiny_bs16_20k.yaml \
---eval-only MODEL.WEIGHTS path_to_checkpoint OUTPUT_DIR path_to_output
 
 # Test
 conda activate hg
@@ -41,6 +32,8 @@ HRFormer
 # mIoU | mDice |
 #+-------+-------+
 # 88.43 | 93.96 |
+
+
 
 
 # ---------------------------------- HRDA-dg ----------------------------------
@@ -96,6 +89,7 @@ mv DeepLab_resnet_pretrained_init-f81d91e8.pth \
 
 
 mkdir -p /home/cbtil3/hao/repo/DG_ICCV_comparison/SAN-SAW-main/log/gta5_pretrain_2
+
 ### Step 2
 cd DG_ICCV_comparison/
 cd SAN-SAW-main
