@@ -353,6 +353,9 @@ def main():
                     dataset: miou
                 })
 
+import transforms.transforms as extended_transforms
+target_aux_train_transform = extended_transforms.MaskToTensor()
+
 def train(train_loader, net, optim, curr_epoch, writer, scheduler, max_iter, teacher_model, criterion, criterion_aux):
     """
     Runs the training loop per epoch
@@ -380,7 +383,12 @@ def train(train_loader, net, optim, curr_epoch, writer, scheduler, max_iter, tea
         if curr_iter >= max_iter:
             break
 
-        inputs, gts, _, aux_gts = data
+        # inputs, gts, _, aux_gts = data
+        # ？ TODO
+        inputs = data["image"]   # "image", "label"
+        gts    = data["label"]
+        aux_gts = target_aux_train_transform(gts)
+
         # ipdb.set_trace()
         # Multi source and AGG case
         if len(inputs.shape) == 5:
