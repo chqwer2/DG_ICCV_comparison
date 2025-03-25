@@ -31,7 +31,7 @@ python train.py \
   --tb_path ./logs/    --max_iter 100000
 
 # Test,  -m torch.distributed.launch --nproc_per_node=1
-snapshot=./logs/2206/r50os16_gtav/03_25_08/last_None_epoch_12_mean-iu_0.00000.pth
+snapshot=./logs/2206/r50os16_gtav/03_25_09/last_None_epoch_199_mean-iu_0.00000.pth
 
 python  valid.py \
   --val_dataset brain \
@@ -49,7 +49,7 @@ python  valid.py \
 
 
 
-# HRFormer
+# --------------------------------  HRFormer --------------------------------
 #  prepare the models pre-trained on ImageNet classificaiton following [tools/README.md](tools/README.md). Finally run:
 #  8 GPUs
 #python plain_train_net.py --num-gpus 8 \
@@ -67,7 +67,7 @@ conda activate hg
 # Train
 python plain_train_net.py \
   --config-file configs/cityscapes/hgformer_swin_tiny_bs16_20k.yaml \
-  --num-gpus 1 --gpu 1  #  --batch_size 16 --output_dir ./output
+  --num-gpus 1 --gpu 0  #  --batch_size 16 --output_dir ./output
 
 # Test
 conda activate hg

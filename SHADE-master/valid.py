@@ -247,7 +247,12 @@ def validate(val_loader, dataset, net, criterion, optim, scheduler, curr_epoch, 
     for val_idx, data in enumerate(val_loader):
         # input        = torch.Size([1, 3, 713, 713])
         # gt_image           = torch.Size([1, 713, 713])
-        inputs, gt_image, img_names, _ = data
+        # inputs, gt_image, img_names, _ =
+        # inputs, gts, _, aux_gts = data
+        inputs = data["image"]   # "image", "label"
+        gts    = data["label"]
+        img_names = val_idx
+        # aux_gts = target_aux_train_transform(gts)
 
         if len(inputs.shape) == 5:
             B, D, C, H, W = inputs.shape
