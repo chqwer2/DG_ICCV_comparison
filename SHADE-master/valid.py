@@ -250,7 +250,7 @@ def validate(val_loader, dataset, net, criterion, optim, scheduler, curr_epoch, 
         # inputs, gt_image, img_names, _ =
         # inputs, gts, _, aux_gts = data
         inputs = data["image"]   # "image", "label"
-        gts    = data["label"]
+        gt_image    = data["label"]
         img_names = val_idx
         # aux_gts = target_aux_train_transform(gts)
 
