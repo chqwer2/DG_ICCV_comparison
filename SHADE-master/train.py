@@ -335,12 +335,12 @@ def main():
                     logging.info(msg)
                 break
 
-        if args.class_uniform_pct:
-            if epoch >= args.max_cu_epoch:
-                train_obj.build_epoch(cut=True)
-                train_loader.sampler.set_num_samples()
-            else:
-                train_obj.build_epoch()
+        # if args.class_uniform_pct:
+        #     if epoch >= args.max_cu_epoch:
+        #         train_obj.build_epoch(cut=True)
+        #         train_loader.sampler.set_num_samples()
+        #     else:
+        #         train_obj.build_epoch()
 
         epoch += 1
 
