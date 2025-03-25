@@ -188,6 +188,7 @@ parser.add_argument('--wandb_name', type=str, default='',
 
 parser.add_argument('--batch_size', type=int, default=2,)
 
+parser.add_argument("--data_loader_workers", type=int, default=4, help="number of workers")
 
 args = parser.parse_args()
 
