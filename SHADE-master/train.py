@@ -185,6 +185,10 @@ parser.add_argument('--proto_trials', type=int, default=1)
 parser.add_argument('--wandb_name', type=str, default='',
                     help='use wandb and wandb name')
 
+
+parser.add_argument('--batch_size', type=int, default=2,)
+
+
 args = parser.parse_args()
 
 # Enable CUDNN Benchmarking optimization

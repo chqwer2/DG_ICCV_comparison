@@ -2,7 +2,10 @@
 cd SHADE-master/
 conda activate flow
 
-python -m torch.distributed.launch --nproc_per_node=1 train.py \
+pip install ipdb
+
+
+python train.py \
   --dataset brain \
   --val_dataset brain \
   --arch network.deepv3.DeepR50V3PlusD \
@@ -24,9 +27,11 @@ python -m torch.distributed.launch --nproc_per_node=1 train.py \
   --date 2206 \
   --exp r50os16_gtav \
   --ckpt ./logs/ \
-  --tb_path ./logs/ \
-  --wandb_name r50os16_gtav
+  --tb_path ./logs/
 
+# --local_rank 0
+
+#   --wandb_name r50os16_gtav
 #  --val_dataset cityscapes bdd100k mapillary \
 
 
