@@ -384,7 +384,6 @@ def train(train_loader, net, optim, curr_epoch, writer, scheduler, max_iter, tea
             break
 
         # inputs, gts, _, aux_gts = data
-        # ？ TODO
         inputs = data["image"]   # "image", "label"
         gts    = data["label"]
         aux_gts = target_aux_train_transform(gts)
@@ -431,7 +430,9 @@ def train(train_loader, net, optim, curr_epoch, writer, scheduler, max_iter, tea
 
             main_out = outputs['main_out']
             aux_out = outputs['aux_out']
-            
+
+            # Here
+            print("main out=", main_out.shape, gt.shape, aux_out.shape)
             main_loss = criterion(main_out, gt)
 
             if aux_gt.dim() == 1:
