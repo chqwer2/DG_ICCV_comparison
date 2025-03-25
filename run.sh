@@ -4,6 +4,7 @@ conda activate flow
 
 pip install ipdb
 
+# Remember to change the datasets.num_classes = 3, if changing dataset
 
 python train.py \
   --dataset brain \

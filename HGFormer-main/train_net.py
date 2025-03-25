@@ -300,6 +300,8 @@ def setup(args):
     cfg.freeze()
     default_setup(cfg, args)
 
+    print("cfg = ", cfg)
+
     cfg.OUTPUT_DIR = "./output"
 
     # Setup logger for "mask_former" module
@@ -334,8 +336,6 @@ if __name__ == "__main__":
     # Add custom arguments
     args.add_argument("--batch_size", type=int, default=16, help="batch size")
     args.add_argument("--data_loader_workers", type=int, default=4, help="number of workers")
-
-    print("Command Line Args:", args)
 
     args = args.parse_args()
 
