@@ -307,7 +307,7 @@ def main():
         torch.cuda.empty_cache()
 
         i = train(train_loader, net, optim, epoch, writer, scheduler, args.max_iter, teacher_model, criterion, criterion_aux)
-        train_loader.sampler.set_epoch(epoch + 1)
+        # train_loader.sampler.set_epoch(epoch + 1)
 
         if (epoch+1) % args.eval_epoch == 0 or i >= args.max_iter:
             # torch.cuda.empty_cache()
@@ -419,11 +419,12 @@ def train(train_loader, net, optim, curr_epoch, writer, scheduler, max_iter, tea
             
             gt = torch.cat((gt, gt), dim=0)
             aux_gt = torch.cat((aux_gt, aux_gt), dim=0)
+
             if teacher_model is not None:
                 with torch.no_grad():
                     imgnet_out = teacher_model(input, out_prob=True, return_style_features=args.rc_layers)
 
-
+            gt = gt.squeeze(1).long()
             optim.zero_grad()
 
             outputs = net(input, style_hallucination=True, out_prob=True, return_style_features=args.rc_layers)
@@ -431,14 +432,15 @@ def train(train_loader, net, optim, curr_epoch, writer, scheduler, max_iter, tea
             main_out = outputs['main_out']   # [4, 19, 512, 512]
             aux_out = outputs['aux_out']     # [4, 19, 32, 32]
 
-            # gt = [4, 1, 512, 512]
-            # Here
-            print("main out=", main_out.shape, gt.shape, aux_out.shape)
-            main_loss = criterion(main_out, gt.squeeze(1).long())
+            # print("main out=", main_out.shape, gt.shape, aux_out.shape)
+            main_loss = criterion(main_out, gt)
 
             if aux_gt.dim() == 1:
                 aux_gt = gt
-            aux_gt = aux_gt.unsqueeze(1).float()
+            if aux_gt.dim() == 3:
+                aux_gt = aux_gt.unsqueeze(1)
+
+            aux_gt = aux_gt.float()
             aux_gt = F.interpolate(aux_gt, size=aux_out.shape[2:], mode='nearest')
             aux_gt = aux_gt.squeeze(1).long()
             aux_loss = criterion_aux(aux_out, aux_gt)
@@ -477,7 +479,7 @@ def train(train_loader, net, optim, curr_epoch, writer, scheduler, max_iter, tea
                 
                 rc_loss_meter.update(feat_loss.item(), C)
 
-            log_total_loss = total_loss.clone().detach_()
+            log_total_loss = total_loss.clone().detach()
             torch.distributed.all_reduce(log_total_loss, torch.distributed.ReduceOp.SUM)
             log_total_loss = log_total_loss / args.world_size
             train_total_loss.update(log_total_loss.item(), batch_pixel_size)
@@ -624,8 +626,8 @@ def validate_for_prototype(train_loader, net, epoch):
     net.eval()
     style_list = torch.empty(size=(0,2,args.style_dim)).cuda() # 0,2,C
     for trial in range(args.proto_trials):
-        if args.set_proto_seed: 
-            train_loader.sampler.set_epoch(epoch + trial)
+        # if args.set_proto_seed:
+            # train_loader.sampler.set_epoch(epoch + trial)
         for val_idx, data in enumerate(train_loader):
             img, _, _, _ = data 
             img = img.cuda()
