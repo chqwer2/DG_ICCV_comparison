@@ -173,7 +173,7 @@ parser.add_argument('--concentration_coeff', type=float, default=0.0156,
 ## proto use seed
 parser.add_argument('--proto_select_epoch', type=int, default=3,
                     help='epoch to select proto')
-parser.add_argument('--online_proto', action='store_true', default=True,
+parser.add_argument('--online_proto', action='store_true', #default=True,
                     help=' use online prototype')
 parser.add_argument('--dynamic_proto', action='store_true', default=True,
                     help='replace proto every several epochs')
@@ -248,7 +248,7 @@ def main():
     if args.online_proto:
         print("args.online_proto")
         print("args.online_proto = ", args.online_proto)
-        
+
         _class_uniform_pct = args.class_uniform_pct
         args.class_uniform_pct = 0
         # Here is the problem
