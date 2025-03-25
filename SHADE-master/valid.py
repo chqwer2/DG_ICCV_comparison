@@ -143,6 +143,11 @@ parser.add_argument('--dist_url', default='tcp://127.0.0.1:', type=str,
 parser.add_argument('--image_in', action='store_true', default=False,
                     help='Input Image Instance Norm')
 
+
+parser.add_argument('--batch_size', type=int, default=2,)
+parser.add_argument("--data_loader_workers", type=int, default=4, help="number of workers")
+
+
 args = parser.parse_args()
 
 # Enable CUDNN Benchmarking optimization
@@ -187,7 +192,11 @@ def main():
     prep_experiment(args, parser)
     writer = None
 
-    _, _, _, extra_val_loaders = datasets.setup_loaders(args)
+    # _, _, _, extra_val_loaders = datasets.setup_loaders(args)
+    from datasets.REFUGE import load_dataset
+    # train_loader, train_obj = load_dataset(args, split="train")
+    val_loader, val_obj = load_dataset(args, split="val")
+    extra_val_loaders = {"brain": val_loader}
 
     criterion, criterion_val = loss.get_loss(args)
     criterion_aux = loss.get_loss_aux(args)

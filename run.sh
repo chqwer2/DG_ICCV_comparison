@@ -29,6 +29,18 @@ python train.py \
   --ckpt ./logs/ \
   --tb_path ./logs/    --max_iter 100000
 
+# Test,  -m torch.distributed.launch --nproc_per_node=1
+snapshot=./logs/2206/r50os16_gtav/03_25_08/last_None_epoch_12_mean-iu_0.00000.pth
+
+python  valid.py \
+  --val_dataset brain \
+  --arch network.deepv3.DeepR50V3PlusD \
+  --date 2207 \
+  --bs_mult_val 12 \
+  --exp r50os16_val \
+  --snapshot $snapshot
+
+
 # --local_rank 0
 
 #   --wandb_name r50os16_gtav
