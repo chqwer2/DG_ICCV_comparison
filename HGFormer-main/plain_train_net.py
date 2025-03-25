@@ -444,7 +444,7 @@ if __name__ == "__main__":
     args = default_argument_parser()#
     args.add_argument("--batch_size", type=int, default=16, help="batch size")
     args.add_argument("--data_loader_workers", type=int, default=4, help="number of workers")
-    args.add_argument("--gpu", type=int, default=0, help="gpu id")
+    args.add_argument("--gpu", type=str, default=0, help="gpu id")
 
 
 
