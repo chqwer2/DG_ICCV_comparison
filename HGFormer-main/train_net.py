@@ -317,7 +317,7 @@ def setup(args):
     # Iter all keys in cfg, find  NUM_CLASSES and change to 3
 
     # cfg. = 3 # TODO
-    print("cfg = ", cfg)
+    print("TODO cfg = ", cfg)
 
 
 
