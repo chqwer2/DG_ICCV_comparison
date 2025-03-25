@@ -441,22 +441,23 @@ def main(args):
 
 
 if __name__ == "__main__":
-    args = default_argument_parser().parse_args()
-
+    args = default_argument_parser()#
     args.add_argument("--batch_size", type=int, default=16, help="batch size")
     args.add_argument("--data_loader_workers", type=int, default=4, help="number of workers")
     args.add_argument("--gpu", type=int, default=0, help="gpu id")
+
+
+
+    args = args.parse_args()
+
     os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu
-    
+
+
     # args.TEST.EVAL_PERIOD = 10  # DEBUG
 
     # Add custom arguments
     # from pprint import pprint
     # pprint("args=", args)
-
-
-
-    os.environ['CUDA_VISIBLE_DEVICES'] = "1"
 
     launch(
         main,
