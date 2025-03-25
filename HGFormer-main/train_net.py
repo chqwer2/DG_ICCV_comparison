@@ -300,7 +300,10 @@ def setup(args):
     cfg.freeze()
     default_setup(cfg, args)
 
+    cfg.NUM_CLASSES = 3 # TODO
     print("cfg = ", cfg)
+
+
 
     cfg.OUTPUT_DIR = "./output"
 
