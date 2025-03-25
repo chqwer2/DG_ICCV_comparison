@@ -10,6 +10,7 @@ refuge_root = "/home/cbtil3/Downloads/REFUGE"
 refuge_crop_size = (512, 512)
 
 
+
 # Define transforms
 def get_transforms(train=True):
     transforms = [
