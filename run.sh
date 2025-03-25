@@ -67,7 +67,7 @@ conda activate hg
 # Train
 python plain_train_net.py \
   --config-file configs/cityscapes/hgformer_swin_tiny_bs16_20k.yaml \
-  --num-gpus 1   #  --batch_size 16 --output_dir ./output
+  --num-gpus 1 --gpu 1  #  --batch_size 16 --output_dir ./output
 
 # Test
 conda activate hg

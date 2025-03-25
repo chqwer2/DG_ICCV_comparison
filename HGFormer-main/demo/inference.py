@@ -70,7 +70,7 @@ def setup_cfg(args):
         # Call the function on your config
 
     update_num_classes(cfg)
-    
+
     return cfg
 
 
