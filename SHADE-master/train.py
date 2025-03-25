@@ -434,7 +434,7 @@ def train(train_loader, net, optim, curr_epoch, writer, scheduler, max_iter, tea
             # gt = [4, 1, 512, 512]
             # Here
             print("main out=", main_out.shape, gt.shape, aux_out.shape)
-            main_loss = criterion(main_out, gt.squeeze(1))
+            main_loss = criterion(main_out, gt.squeeze(1).long())
 
             if aux_gt.dim() == 1:
                 aux_gt = gt
