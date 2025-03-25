@@ -27,7 +27,7 @@ python train.py \
   --date 2206 \
   --exp r50os16_gtav \
   --ckpt ./logs/ \
-  --tb_path ./logs/
+  --tb_path ./logs/    --max_iter 100000
 
 # --local_rank 0
 
