@@ -246,8 +246,12 @@ def main():
 
     ## train proto loader
     if args.online_proto:
+        print("args.online_proto")
+        print("args.online_proto = ", args.online_proto)
+        
         _class_uniform_pct = args.class_uniform_pct
         args.class_uniform_pct = 0
+        # Here is the problem
         train_proto_loader, _,_,_ = datasets.setup_loaders(args)
         args.class_uniform_pct = _class_uniform_pct
 
