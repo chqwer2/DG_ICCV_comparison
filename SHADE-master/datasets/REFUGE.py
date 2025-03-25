@@ -41,7 +41,7 @@ def load_dataset(args, split="train"):
     img_files  = sorted(glob.glob(os.path.join(img_dir, "*.jpg")))
     mask_files = sorted(glob.glob(os.path.join(mask_dir, "*.png")))
 
-    DEBUG = True
+    DEBUG = False
 
     if DEBUG:
         img_files  = img_files[:20]
