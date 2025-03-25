@@ -60,6 +60,10 @@ conda activate hg
 wget https://github.com/SwinTransformer/storage/releases/download/v1.0.0/swin_tiny_patch4_window7_224.pth
 python tools/convert-pretrained-swin-model-to-d2.py swin_tiny_patch4_window7_224.pth swin_tiny_patch4_window7_224.pkl
 
+
+cd HGFormer-main/
+conda activate hg
+
 # Train
 python plain_train_net.py \
   --config-file configs/cityscapes/hgformer_swin_tiny_bs16_20k.yaml \
