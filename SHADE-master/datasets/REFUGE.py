@@ -41,6 +41,13 @@ def load_dataset(args, split="train"):
     img_files  = sorted(glob.glob(os.path.join(img_dir, "*.jpg")))
     mask_files = sorted(glob.glob(os.path.join(mask_dir, "*.png")))
 
+    DEBUG = False
+
+    if DEBUG:
+        img_files  = img_files[:20]
+        mask_files = mask_files[:20]
+
+
     print(f"Found {len(img_files)} images and {len(mask_files)} masks in {split} split")
 
     data = [{"image": img, "label": mask} for img, mask in zip(img_files, mask_files)]
