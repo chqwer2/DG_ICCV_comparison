@@ -55,6 +55,22 @@ def setup_cfg(args):
     cfg.merge_from_file(args.config_file)
     cfg.merge_from_list(args.opts)
     cfg.freeze()
+
+    def update_num_classes(cfg):
+        if isinstance(cfg, dict):
+            for key, value in cfg.items():
+                if key == 'NUM_CLASSES':
+                    cfg[key] = 3  # TODO
+                else:
+                    update_num_classes(value)
+        elif isinstance(cfg, list):
+            for item in cfg:
+                update_num_classes(item)
+
+        # Call the function on your config
+
+    update_num_classes(cfg)
+    
     return cfg
 
 
