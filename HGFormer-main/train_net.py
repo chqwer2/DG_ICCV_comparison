@@ -316,10 +316,6 @@ def setup(args):
 
     # Iter all keys in cfg, find  NUM_CLASSES and change to 3
 
-    # cfg. = 3 # TODO
-    print("TODO cfg = ", cfg)
-
-
 
     cfg.OUTPUT_DIR = "./output"
 
@@ -330,6 +326,10 @@ def setup(args):
 
 def main(args):
     cfg = setup(args)
+
+
+    print("TODO cfg = ", cfg)
+
 
     if args.eval_only:
         model = Trainer.build_model(cfg)
@@ -345,6 +345,9 @@ def main(args):
         return res
 
     trainer = Trainer(cfg)
+
+    print("TODO cfg = ", cfg)
+
     trainer.resume_or_load(resume=args.resume)
     return trainer.train()
 
