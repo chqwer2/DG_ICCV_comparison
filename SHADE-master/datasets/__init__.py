@@ -21,7 +21,7 @@ from torch.utils.data import DataLoader, ConcatDataset
 import torch
 
 
-num_classes = 19
+num_classes = 3 #?
 ignore_label = 255
 
 
