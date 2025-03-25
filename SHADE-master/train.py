@@ -428,12 +428,13 @@ def train(train_loader, net, optim, curr_epoch, writer, scheduler, max_iter, tea
 
             outputs = net(input, style_hallucination=True, out_prob=True, return_style_features=args.rc_layers)
 
-            main_out = outputs['main_out']
-            aux_out = outputs['aux_out']
+            main_out = outputs['main_out']   # [4, 19, 512, 512]
+            aux_out = outputs['aux_out']     # [4, 19, 32, 32]
 
+            # gt = [4, 1, 512, 512]
             # Here
             print("main out=", main_out.shape, gt.shape, aux_out.shape)
-            main_loss = criterion(main_out, gt)
+            main_loss = criterion(main_out, gt.squeeze(1))
 
             if aux_gt.dim() == 1:
                 aux_gt = gt
