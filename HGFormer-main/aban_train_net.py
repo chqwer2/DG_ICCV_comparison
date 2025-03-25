@@ -361,6 +361,8 @@ if __name__ == "__main__":
 
     args = args.parse_args()
 
+    print("    cfg = setup(args)= ",    setup(args))
+
 
     launch(
         main,

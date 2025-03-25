@@ -370,6 +370,23 @@ def setup(args):
     default_setup(cfg, args)
     # Setup logger for "mask_former" module
     setup_logger(output=cfg.OUTPUT_DIR, distributed_rank=comm.get_rank(), name="mask2former")
+
+    def update_num_classes(cfg):
+        if isinstance(cfg, dict):
+            for key, value in cfg.items():
+                if key == 'NUM_CLASSES':
+                    cfg[key] = 3  # TODO
+                else:
+                    update_num_classes(value)
+        elif isinstance(cfg, list):
+            for item in cfg:
+                update_num_classes(item)
+
+        # Call the function on your config
+
+    update_num_classes(cfg)
+
+
     return cfg
 
 
