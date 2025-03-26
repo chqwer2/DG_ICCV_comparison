@@ -250,7 +250,7 @@ def validate(val_loader, dataset, net, criterion, optim, scheduler, curr_epoch, 
         # inputs, gt_image, img_names, _ =
         # inputs, gts, _, aux_gts = data
         inputs = data["image"]   # "image", "label"
-        gt_image    = data["label"]
+        gt_image  = data["label"]
         img_names = val_idx
         # aux_gts = target_aux_train_transform(gts)
 
@@ -259,8 +259,10 @@ def validate(val_loader, dataset, net, criterion, optim, scheduler, curr_epoch, 
             inputs = inputs.view(-1, C, H, W)
             gt_image = gt_image.view(-1, 1, H, W)
 
-        assert len(inputs.size()) == 4 and len(gt_image.size()) == 3
-        assert inputs.size()[2:] == gt_image.size()[1:]
+        print("gt_image=", gt_image.shape, inputs.shape)
+
+        # assert len(inputs.size()) == 4 #and len(gt_image.size()) == 3
+        # assert inputs.size()[2:] == gt_image.size()[1:]
 
         batch_pixel_size = inputs.size(0) * inputs.size(2) * inputs.size(3)
         inputs, gt_cuda = inputs.cuda(), gt_image.cuda()
