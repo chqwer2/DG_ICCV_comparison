@@ -272,6 +272,17 @@ def validate(val_loader, dataset, net, criterion, optim, scheduler, curr_epoch, 
 
         del inputs
 
+        num_classes = 3
+        mask = torch.randint(0, num_classes, (1, 1, 512, 512))  # example mask
+
+        # Squeeze to remove the 1 channel dim, then one-hot encode
+        mask_one_hot = torch.nn.functional.one_hot(mask.squeeze(1), num_classes=num_classes)
+
+        # Transpose to shape [B, C, H, W]
+        gt_image = mask_one_hot.permute(0, 3, 1, 2).float()
+
+        print("output/gt=", output.shape, gt_image.shape)
+        # output/gt= torch.Size([1, 1, 512, 512]) -> torch.Size([1, 3, 512, 512])
         assert output.size()[2:] == gt_image.size()[1:]
         assert output.size()[1] == datasets.num_classes
 
