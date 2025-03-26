@@ -287,7 +287,7 @@ def validate(val_loader, dataset, net, criterion, optim, scheduler, curr_epoch, 
         assert output.size()[2:] == gt_image.size()[1:]
         assert output.size()[1]  == datasets.num_classes
 
-        gt_cuda = gt_cuda.squeeze(1)
+        gt_cuda = gt_cuda.squeeze(1).long()
         val_loss.update(criterion(output, gt_cuda).item(), batch_pixel_size)
 
         del gt_cuda
