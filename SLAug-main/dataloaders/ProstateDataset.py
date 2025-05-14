@@ -241,7 +241,7 @@ def get_validation(modality, tile_z_dim=3):
 def get_training(modality, location_scale,  tile_z_dim = 3):
     return ProstateDataset(
         split='train', \
-        domain_idx = [0],\
+        domain_idx = 0,\
         # transforms = tr_func,\
         base_dir = BASEDIR,\
         # extern_norm_fn = partial(get_normalize_op,domain=True),
