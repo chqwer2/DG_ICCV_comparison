@@ -72,7 +72,7 @@ class ProstateDataset(Dataset):
         self.domain_idx = domain_idx
         self.split = split
         self.all_label_names = LABEL_NAME
-        
+
         self.id_path = os.listdir(os.path.join(self.base_dir, self.domain_name[self.domain_idx], 'image'))
 
         if self.num is not None:
