@@ -232,7 +232,7 @@ def get_validation(modality, tile_z_dim=3):
     return Prostate_Multi(
         split='val', \
         # transforms=None, \
-        domain_idx=[1, 2, 3, 4, 5], \
+        domain_idx_list=[1, 2, 3, 4, 5], \
         base_dir=BASEDIR )
         # extern_norm_fn=partial(get_normalize_op, domain=False),
         # tile_z_dim=tile_z_dim)
@@ -254,7 +254,7 @@ def get_test(modality,  tile_z_dim = 3):
         return Prostate_Multi(
             split='val', \
             # transforms=None, \
-            domain_idx=[1, 2, 3, 4, 5], \
+            domain_idx_list=[1, 2, 3, 4, 5], \
             base_dir=BASEDIR)
 
 # if __name__ == '__main__':
