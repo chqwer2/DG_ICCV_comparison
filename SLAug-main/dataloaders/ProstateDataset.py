@@ -61,6 +61,7 @@ def source_to_target_freq( src_img, amp_trg, L=0.1 ):
 
     return src_in_trg.transpose(1, 2, 0)
 
+LABEL_NAME = ["bg", "Prostate"]
 
 # Volumn
 class ProstateDataset(Dataset):
@@ -70,7 +71,8 @@ class ProstateDataset(Dataset):
         self.domain_name = ['Domain1', 'Domain2', 'Domain3', 'Domain4', 'Domain5', 'Domain6']
         self.domain_idx = domain_idx
         self.split = split
-
+        self.all_label_names = LABEL_NAME
+        
         self.id_path = os.listdir(os.path.join(self.base_dir, self.domain_name[self.domain_idx], 'image'))
 
         if self.num is not None:
@@ -136,11 +138,12 @@ class Prostate_Multi(Dataset):
     def __init__(self, domain_idx_list=None, base_dir=None, split='train', num=None, transform=None, is_freq=True, is_out_domain=False, test_domain_idx=None):
         self.base_dir = base_dir
         self.num = num
-        self.domain_name = ['Domain2', 'Domain3', 'Domain4', 'Domain5', 'Domain6']
+        self.domain_name = ['Domain1', 'Domain2', 'Domain3', 'Domain4', 'Domain5', 'Domain6']
         self.domain_idx_list = domain_idx_list
         self.split = split
         self.is_freq = is_freq
         self.is_out_domain = is_out_domain
+        self.all_label_names = LABEL_NAME
         self.test_domain_idx = test_domain_idx
 
         self.id_path = []
