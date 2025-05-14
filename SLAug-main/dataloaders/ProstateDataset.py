@@ -77,7 +77,7 @@ class ProstateDataset(Dataset):
 
         if self.num is not None:
             self.id_path = self.id_path[:self.num]
-        print("total {} samples".format(len(self.id_path)))
+        print("Prostate total {} samples".format(len(self.id_path)))
     
     def __len__(self):
         return len(self.id_path)
@@ -154,7 +154,7 @@ class Prostate_Multi(Dataset):
 
         if self.num is not None:
             self.id_path = self.id_path[:self.num]
-        print("total {} samples".format(len(self.id_path)))
+        print("Prostate total {} samples".format(len(self.id_path)))
 
     def __len__(self):
         return len(self.id_path)
