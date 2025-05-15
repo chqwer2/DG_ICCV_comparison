@@ -39,7 +39,7 @@ data:
           - [Domain2, Domain3, Domain4, Domain5, Domain6]
         tile_z_dim: 1
     test:
-      target: dataloaders.AbdominalDataset.get_test_all
+      target: dataloaders.ProstateDataset.get_test
       params:
         modality:
           - [Domain2, Domain3, Domain4, Domain5, Domain6]

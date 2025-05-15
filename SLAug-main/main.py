@@ -208,17 +208,27 @@ if __name__ == "__main__":
     data.prepare_data()
     data.setup()
     print(len(data.datasets["train"]))
-    train_loader=DataLoader(data.datasets["train"], batch_size=data.batch_size,
+    train_loader = DataLoader(data.datasets["train"], batch_size=data.batch_size,
                           num_workers=data.num_workers, shuffle=True, persistent_workers=True, drop_last=True, pin_memory = True)
 
-    val_loader=DataLoader(data.datasets["validation"], batch_size=data.batch_size,  num_workers=1)
+    val_loader = []
+    for d in data.datasets["validation"]:
+        d = DataLoader(d, batch_size=data.batch_size,  num_workers=1)
+        val_loader.append(d)
+
+
+
 
     if data.datasets.get('test') is not None:
-        test_loader=DataLoader(data.datasets["test"], batch_size=1, num_workers=1)
+        test_loader = []
+        for d in data.datasets["test"]:
+            d = DataLoader(d, batch_size=1, num_workers=1)
+            test_loader.append(d)
+        # test_loader = DataLoader(data.datasets["test"], batch_size=1, num_workers=1)
         best_test_dice = 0
-        test_phase=True
+        test_phase = True
     else:
-        test_phase=False
+        test_phase = False
 
     if getattr(optimizer_config, 'warmup_iter'):
         if optimizer_config.warmup_iter>0:
@@ -235,9 +245,9 @@ if __name__ == "__main__":
             scheduler.step()
 
         # Save Bset model on val
-        if (cur_epoch+1) % 1 ==0:  # TODO Evaluation
+        if (cur_epoch+1) % 10 ==0:  # TODO Evaluation
             cur_dice = evaluate(model, val_loader, torch.device('cuda'))
-            if np.mean(cur_dice)>best_dice:
+            if np.mean(cur_dice) > best_dice:
                 best_dice=np.mean(cur_dice)
                 for f in os.listdir(ckptdir):
                     if 'val' in f:
@@ -246,7 +256,7 @@ if __name__ == "__main__":
 
             str=f'Epoch [{cur_epoch}]   '
             for i,d in enumerate(cur_dice):
-                str+=f'Class {i}: {d}, '
+                str+=f'Domain {i+1}: {d}, '
             str+=f'Validation DICE {np.mean(cur_dice)}/{best_dice}'
             print(str)
 

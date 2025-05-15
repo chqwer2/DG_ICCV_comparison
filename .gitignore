@@ -1,12 +1,19 @@
 # Generation results
 results/
+*.npy
+*.npz
+*.png
+*.csv
+*.txt
+*.ckpt
+*.svg
+*.gz
+logs
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
-
-.idea
 
 # C extensions
 *.so
@@ -42,6 +49,7 @@ MANIFEST
 log./
 log.txt
 .log
+logs./
 
 # Installer logs
 pip-log.txt
@@ -150,3 +158,5 @@ unet_cache/2.jpg
 
 *.jpg
 *.swp
+
+comparison/TADM/wandb/

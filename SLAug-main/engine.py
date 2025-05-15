@@ -199,21 +199,37 @@ def evaluate(model: torch.nn.Module, data_loader: Iterable, device: torch.device
     def convert_to_one_hot(tensor,num_c):
         return F.one_hot(tensor,num_c).permute((0,3,1,2))
     dices=[]
-    for samples in data_loader:
-        for k, v in samples.items():
-            if isinstance(samples[k], torch.Tensor):
-                samples[k] = v.to(device)
-        img = samples['images']
-        lbl = samples['labels']
-        logits = model(img)
-        num_classes=logits.size(1)
-        pred=torch.argmax(logits,dim=1)
-        one_hot_pred=convert_to_one_hot(pred,num_classes)
-        one_hot_gt=convert_to_one_hot(lbl,num_classes)
-        dice=compute_meandice(one_hot_pred,one_hot_gt,include_background=False)
-        dices.append(dice.cpu().numpy())
-    dices=np.concatenate(dices,0)
-    dices=np.nanmean(dices,0)
+    if not isinstance(data_loader, list):
+        data_loader = [data_loader]
+
+    dices = [[] for _ in range(len(data_loader))]
+
+    for d_id, data_loader_ in enumerate(data_loader):
+        for samples in data_loader_:
+            for k, v in samples.items():
+                if isinstance(samples[k], torch.Tensor):
+                    samples[k] = v.to(device)
+            img = samples['images']
+            lbl = samples['labels']
+            logits = model(img)
+            num_classes=logits.size(1)
+            pred=torch.argmax(logits, dim=1)
+            # print(f"logits[1] shape: {pred.shape}, {logits[:,1].max()}, gt shape: {lbl.shape}, {lbl.max()}")
+
+            one_hot_pred=convert_to_one_hot(pred,num_classes)
+            one_hot_gt=convert_to_one_hot(lbl,num_classes)
+
+            # print(f"pred shape: {one_hot_pred.shape}, {one_hot_pred.max()}, gt shape: {one_hot_gt.shape}, {one_hot_gt.max()}")
+
+            dice = compute_meandice(one_hot_pred, one_hot_gt, include_background=False)
+            # print("Dice = ", dice)
+
+            dices[d_id].append(dice.cpu().numpy())
+
+        dices[d_id] = np.concatenate(dices[d_id],0)
+        dices[d_id] = np.nanmean(dices[d_id],0)
+
+    # print("Eval Dice = ", dices)
     return dices
 
 def prediction_wrapper(model, test_loader, epoch, label_name, mode = 'base', save_prediction = False):
