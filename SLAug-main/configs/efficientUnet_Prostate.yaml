@@ -23,7 +23,7 @@ saliency_balancing_fusion:
 data:
   target: main.DataModuleFromConfig
   params:
-    batch_size: 12
+    batch_size: 14
     num_workers: 8
     train:
       target: dataloaders.ProstateDataset.get_training
@@ -42,6 +42,6 @@ data:
       target: dataloaders.AbdominalDataset.get_test_all
       params:
         modality:
-          - SABSCT
+          - [Domain2, Domain3, Domain4, Domain5, Domain6]
         tile_z_dim: 1
 

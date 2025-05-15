@@ -135,7 +135,8 @@ class ProstateDataset(Dataset):
 
 
 class Prostate_Multi(Dataset):
-    def __init__(self, domain_idx_list=None, base_dir=None, split='train', num=None, transform=None, is_freq=True, is_out_domain=False, test_domain_idx=None):
+    def __init__(self, domain_idx_list=None, base_dir=None, split='train', num=None, transform=None, is_freq=True, is_out_domain=False,
+                 test_domain_idx=None):
         self.base_dir = base_dir
         self.num = num
         self.domain_name = ['Domain1', 'Domain2', 'Domain3', 'Domain4', 'Domain5', 'Domain6']
@@ -144,7 +145,7 @@ class Prostate_Multi(Dataset):
         self.is_freq = is_freq
         self.is_out_domain = is_out_domain
         self.all_label_names = LABEL_NAME
-        self.test_domain_idx = test_domain_idx
+        self.test_domain_idx = test_domain_idx if test_domain_idx else self.domain_idx_list
 
         self.id_path = []
         for domain_idx in self.domain_idx_list:

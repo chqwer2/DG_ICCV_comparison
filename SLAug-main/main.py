@@ -235,7 +235,7 @@ if __name__ == "__main__":
             scheduler.step()
 
         # Save Bset model on val
-        if (cur_epoch+1)%100==0:
+        if (cur_epoch+1) % 1 ==0:  # TODO Evaluation
             cur_dice = evaluate(model, val_loader, torch.device('cuda'))
             if np.mean(cur_dice)>best_dice:
                 best_dice=np.mean(cur_dice)
