@@ -6,6 +6,7 @@ import torch
 import torch.nn.functional as F
 from torch.utils.data import Dataset
 
+from .location_scale_augmentation import LocationScaleAugmentation
 
 def extract_amp_spectrum(img_np):
     # trg_img is of dimention CxHxW (C = 3 for RGB image and 1 for slice)
@@ -72,7 +73,11 @@ class ProstateDataset(Dataset):
         self.domain_idx = domain_idx
         self.split = split
         self.all_label_names = LABEL_NAME
+        self.transforms = transform
+        self.location_scale = LocationScaleAugmentation(vrange=(0., 1.), background_threshold=0.01)
+        self.nclass=2
 
+        self.is_train= True
         self.id_path = os.listdir(os.path.join(self.base_dir, self.domain_name[self.domain_idx], 'image'))
 
         if self.num is not None:
@@ -110,7 +115,30 @@ class ProstateDataset(Dataset):
             
             img = sample['img']
             mask = sample['mask']
+
+
+            if self.location_scale is not None:
+                # seems numpy
+
+                GLA = self.location_scale.Global_Location_Scale_Augmentation(img.copy())
+                LLA = self.location_scale.Local_Location_Scale_Augmentation(img.copy(), mask.astype(np.int32))
+                comp = np.concatenate([GLA, LLA, mask], -1)
+
+                if self.transforms:
+                    timg, lb = self.transforms(comp, c_img=3, c_label=1, nclass=self.nclass, is_train=self.is_train,
+                                               use_onehot=False)
+                    GLA, LLA = np.split(timg, 2, -1)
+
+                img = GLA
+                aug_img = LLA
+                aug_img = aug_img.transpose(2, 0, 1)
+                
+            else:
+                aug_img = img.transpose(2, 0, 1)
+                aug_img = torch.from_numpy(aug_img).float()
+
             img = img.transpose(2, 0, 1)
+
             
             img = torch.from_numpy(img).float()
             mask = torch.from_numpy(mask)#.long()
@@ -122,12 +150,12 @@ class ProstateDataset(Dataset):
 
             sample = {"images": img,
                       "labels": mask.long(),
-                      "is_start": True,
-                      "is_end": True,
+                      "is_start": False,
+                      "is_end": False,
                       "nframe": 1,
                       "scan_id": index,
                       "z_id": 1,
-                      "aug_images": img,
+                      "aug_images": aug_img,
                       }
             return sample
             
@@ -135,7 +163,7 @@ class ProstateDataset(Dataset):
 
 
 class Prostate_Multi(Dataset):
-    def __init__(self, domain_idx_list=None, base_dir=None, split='train', num=None, transform=None, is_freq=False, is_out_domain=False,
+    def __init__(self, domain_idx_list=None, base_dir=None, split='train', num=None, transform=None, is_freq=True, is_out_domain=False,
                  test_domain_idx=None):
         self.base_dir = base_dir
         self.num = num
@@ -162,11 +190,7 @@ class Prostate_Multi(Dataset):
 
     def __getitem__(self, index):
         train_domain_name = self.domain_name.copy()
-        # train_domain_name.remove(self.domain_name[self.test_domain_idx])
-        for idx in self.test_domain_idx:
-            train_domain_name.remove(self.domain_name[idx])
-
-
+        train_domain_name.remove(self.domain_name[self.test_domain_idx])
         id = self.id_path[index]
         img = np.load(os.path.join(self.base_dir, id))
         cur_domain_name = id.split('/')[0]
@@ -221,17 +245,7 @@ class Prostate_Multi(Dataset):
                     onehot_label = sample['onehot_label']
                     onehot_label = torch.from_numpy(onehot_label).long()
                     return img, img_freq, mask.long(), onehot_label
-                # return img, img_freq, mask.long()
-                sample = {"images": img,
-                          "labels": mask.long(),
-                          "is_start": True,
-                          "is_end": True,
-                          "nframe": 1,
-                          "scan_id": index,
-                          "z_id": 1,
-                          "aug_images": img,
-                          }
-                return sample
+                return img, img_freq, mask.long()
 
             else:
                 img = img.transpose(2, 0, 1)
@@ -241,31 +255,19 @@ class Prostate_Multi(Dataset):
                     onehot_label = sample['onehot_label']
                     onehot_label = torch.from_numpy(onehot_label).long()
                     return img, mask.long(), onehot_label
-                # return img, mask.long()
+                return img, mask.long()
 
-                sample = {"images": img,
-                          "labels": mask.long(),
-                          "is_start": True,
-                          "is_end": True,
-                          "nframe": 1,
-                          "scan_id": index,
-                          "z_id": 1,
-                          "aug_images": img,
-                          }
-                return sample
 
 BASEDIR = './data/prostate'
 
 def get_validation(modality, tile_z_dim=3):
-    data_list = []
-    for id in [1, 2, 3, 4, 5]:
-        data_list.append(Prostate_Multi(
+    return Prostate_Multi(
         split='val', \
         # transforms=None, \
-        domain_idx_list=[id], \
-        base_dir=BASEDIR ))
-
-    return data_list
+        domain_idx_list=[1, 2, 3, 4, 5], \
+        base_dir=BASEDIR )
+        # extern_norm_fn=partial(get_normalize_op, domain=False),
+        # tile_z_dim=tile_z_dim)
 
 # domain_idx=None, base_dir=None, split='train', num=None, transform=None
 def get_training(modality, location_scale,  tile_z_dim = 3):
@@ -281,15 +283,11 @@ def get_training(modality, location_scale,  tile_z_dim = 3):
 
 
 def get_test(modality,  tile_z_dim = 3):
-    data_list = []
-    for id in [1, 2, 3, 4, 5]:
-        data_list.append(Prostate_Multi(
+        return Prostate_Multi(
             split='val', \
             # transforms=None, \
-            domain_idx_list=[id], \
-            base_dir=BASEDIR))
-
-    return data_list
+            domain_idx_list=[1, 2, 3, 4, 5], \
+            base_dir=BASEDIR)
 
 # if __name__ == '__main__':
 #     import transform as trans
